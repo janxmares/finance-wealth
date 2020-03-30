@@ -164,7 +164,7 @@ hhm_data <- data.table(hhm_data_std, hhm_data[j=names(hhm_data) %in% nostd, with
 #
 
 # Run BMA, baseline
-bma_finind <- bms(hhm_data, iter=15000000, burn=3000000, mprior = "uniform", g = "hyper",
+bma_finind <- bms(hhm_data, iter=5000000, burn=1000000, mprior = "uniform", g = "hyper",
                   nmodel=5000, mcmc="bd", user.int= F)
 
 # Show summaries of the results

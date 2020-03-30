@@ -1,0 +1,1466 @@
+%!TEX program = xelatex
+
+\documentclass[a4paper,11pt]{article}
+%\usepackage[cp1250]{inputenc} %Czech and Slovak symbols
+%\usepackage{a4wide}
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{amsmath, amsthm, amssymb} %better typesetting of mathematical expressions, theorems, additional symbols
+\usepackage{booktabs}%fixltx2e}
+\usepackage[flushleft]{threeparttable}
+\usepackage{tabularx}
+\usepackage[capposition=top]{floatrow}
+\usepackage{caption}
+\captionsetup[measuredfigure]{labelformat=empty}
+\usepackage{bm}
+\usepackage{subcaption}
+%\usepackage{epstopdf} % not supported by xelatex
+\usepackage{fullpage}
+\usepackage{enumerate}
+\usepackage{setspace}
+\usepackage{authblk}
+\usepackage{fontspec}
+\usepackage{lscape}
+\usepackage[round]{natbib} %standard package for bibliography
+\usepackage{multirow}
+\usepackage[figuresleft]{rotating}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{colortbl}
+\usepackage{geometry}
+\usepackage{hyperref} %hyperlink support
+\hypersetup{pdfstartview={XYZ null null 1.00},bookmarksnumbered, hypertexnames=false, colorlinks=true, linkcolor=BrickRed, citecolor=MidnightBlue, urlcolor=MidnightBlue} %zoom: default screen; numbers for bookmarks
+
+%
+%
+%\usepackage{parskip}
+\usepackage[nolist]{acronym}
+\usepackage{longtable}
+\acrodef{bma}[BMA]{Bayesian Model Averaging}
+\acrodef{bic}[BIC]{Bayesian Information Criterion}
+\acrodef{cbf}[CBF]{Conditional Bayes Factor}
+\acrodefplural{cbf}[CBFs]{Conditional Bayes Factors}
+\acrodef{cswd}[CSWD]{Credit Suisse Wealth Databook}
+\acrodef{gfdd}[GFDD]{Global Financial Development Database}
+\acrodef{pip}[PIP]{Posterior Inclusion Probability}
+\acrodefplural{pip}[PIPs]{Posterior Inclusion Probabilities}
+\acrodef{fdi}[FDI]{Foreign Direct Investment}
+\acrodefplural{fdi}[FDIs]{Foreign Direct Investments}
+\acrodef{gdp}[GDP]{Gross Domestic Product}
+\acrodef{uip}[UIP]{Unit Information Prior}
+\acrodef{wb}[WB]{World Bank}
+\acrodef{oecd}[OECD]{Organisation for Co-operation and Development}
+\acrodef{ivbma}[IVBMA]{Instrumental Variable Bayesian Model Averaging}
+\acrodef{wid}[WID]{World Inequality Database}
+\acrodef{hbs}[HBS]{Household Balance Sheet}
+\acrodef{uk}[UK]{United Kingdom}
+\acrodef{us}[US]{United States}
+\acrodef{efw}[EFW]{Economic Freedom of the World}
+\acrodef{pmp}[PMP]{Posterior Model Probability}
+
+%
+%
+\setcounter{page}{1}
+
+\setlength\parindent{34pt}
+\onehalfspacing
+\title{Finance and Wealth Inequality\thanks{We thank two anonymous referees, Joshua Aizenman, Trinil Arimurti, Nauro Campos, Alex Cukierman, Michael Koetter, Lubos Pastor, Fabien Rondeau and Dimitrios Tsomocos for helpful discussions and seminar participants at the Annual International Conference on Macroeconomic Analysis and International Finance, European Public Choice Annual Conference, Financial Engineering and Banking Society Annual Conference, Multinational Finance Society Annual Conference, Charles University, Leibniz Institute for East and Southeast European Studies and University of Economics, Prague for helpful comments. Horvath acknowledges support from the Czech Science Foundation No. 19-15650S. Mares acknowledges the hospitality of Columbia University, where he stayed as visiting researcher in January-April 2018 thanks to the support by the H2020-MSCA-RISE project GEMCLIME-2020 GA No. 681228, and support from Grant Agency of Charles University No. 768217. Horvath acknowledges the hospitality of Leibniz Institute for East and Southeast European Studies, where he stayed as visiting researcher in January-February 2018. Horvath and Mares acknowledge support from Charles University Research Centre program No. UNCE/HUM/035. Hasan acknowledges the financial support from the Australian Research Council via Discovery Grant DP170101413 for this research. The views are not necessarily of Bank of Finland.}}
+
+
+\author[a,b,c]{Iftekhar Hasan}
+\author[d,e]{Roman Horvath}
+\author[d]{Jan Mares\footnote{\footnotesize Corresponding author's address: IES FSV UK, Opletalova 26, 110 00, Praha 1; \textbf{e-mail:janxmares@gmail.com}}}
+\affil[a]{Fordham University}
+\affil[b]{Bank of Finland}
+\affil[c]{University of Sydney}
+\affil[d]{Charles University, Prague}
+\affil[e]{University of Ss. Cyril and Methodius in Trnava}
+
+
+%\renewcommand\Authands{ and }
+\date{\today}
+%\bibliographystyle{stylebib}
+\begin{document}
+
+\clubpenalty 9999 %no orphants (typographic properties)
+\widowpenalty 9999 %no widows (typographic properties)
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi} %shortcut for Stata tables
+
+\maketitle
+% \thispagestyle{empty}
+
+\begin{abstract}
+Using a global sample, this paper investigates the determinants of wealth inequality capturing various economic, financial, political, institutional, and geographical indicators. Using instrumental variable Bayesian model averaging, it reveals that only a handful of indicators robustly matters and finance plays a key role. It reports that while financial depth increases wealth inequality, efficiency and access to finance reduce inequality. In addition, redistribution and education are associated with lower inequality whereas wars and openness to international trade contribute to greater wealth inequality.
+\end{abstract}
+
+\bigskip
+%\bigskip
+
+\begin{tabular}{p{0.25\hsize}p{0.6\hsize}} %0.15
+\textbf{Keywords:} & Wealth inequality, finance, Bayesian model averaging
+\end{tabular}
+
+\bigskip
+
+\begin{tabular}{p{0.25\hsize}p{0.6\hsize}}
+\textbf{JEL Codes:} & D31, E21\\
+\end{tabular}
+
+\clearpage
+\section{Introduction}
+\label{sec:intro}
+%\doublespacing
+
+Wealth inequality differs markedly across countries \citep{daviesetal2011,daviesetal2017,milanovic2016global}. The wealth share of the top 1\% in the US is currently approximately 40\%, and it is even higher in Russia. On the other hand, the wealth share of the top 1\% is approximately 20\% in France and even lower in the UK \citep{zucman2018}. What accounts for these (dramatic) differences in wealth inequality across countries? Is it different degrees of redistribution, financial development, globalization, technological progress or economic development? Alternatively, are there possibly some other factors? Although extensive progress has been made regarding the measurement of wealth inequality  \citep{alvaredoetal2013,daviesetal2011,daviesetal2017,pikettyandzucman2014,SaezZucman2016}, we still lack systematic evidence about the determinants of wealth inequality across countries.
+
+The theoretical models of wealth inequality suggest that several factors affect wealth inequality. The theoretical principles of the $r > g$ concept\footnote{This means that the rate of return on capital, $r$, exceeds economic growth, $g$.} laid out in \citet{piketty2014} predict that there is a natural tendency of wealth inequality to increase in capitalist economies, which can be overcome only by redistribution or wars. This concept has received criticism from the theoretical point of view \citep{blume2015capital,mankiw2015yes}.\footnote{See \citet{king2017literature} for a review of the literature about the topic.} 
+
+Dynamic quantitative models represent another approach to understand wealth inequality and focus on the heterogeneity of returns, preferences, transmission of human capital, and bequests. \citet{DENARDI2017280} provide an overview of these models and their ability to mirror empirical wealth distributions. One of the conclusions is that all of the models critically rely on the saving motives of individuals. The theoretical predictions regarding wealth inequality arise from the model by \citet{pastor2016income}, in which inequality depends on the skill and risk aversion of entrepreneurs, taxation, and the development of financial markets.\footnote{More specifically, it depends on the ability of entrepreneurs to diversify away their idiosyncratic risk, which can be interpreted as a measure of financial development.} Overall, the theoretical models postulate that several factors may matter for wealth inequality but do not provide a single theoretical framework to guide the exact regression model specifications. 
+
+In this paper, we study the potential determinants of wealth distribution by relying on a global sample of countries and examining a wide array of possible determinants. Given that there is no encompassing theoretical framework, we propose to employ \ac{bma} as our methodological framework. \ac{bma} is a well-established approach within statistical theory and addresses the inherent regression model uncertainty in a unifying framework \citep{Koopetal2007,Rafteryetal1997}.\footnote{\ac{bma} has been applied to examine various issues in economics and finance, such as to study economic growth \citep{Durlaufetal2008,Fernandezetal2001}, stock market predictability  \citep{avramov,cremers}, intertemporal elasticity of substitution \citep{Havraneketal2015}, exchange rate forecasting \citep{wright} and interactions between credit spreads and economic activity \citep{faust2013}.} 
+
+
+In essence, the \ac{bma} procedure evaluates different combinations of explanatory variables and weights the corresponding coefficients using the measure of model fit. In addition, \ac{bma} is the perfect tool for the evaluation of numerous regressors and estimating their \ac{pip}, the probability that a given regressor should be in the `optimal' model of wealth inequality. We address potential endogeneity within the estimation by using lagged values of explanatory variables and, more rigorously, by relying on the \ac{ivbma} approach by \citet{KarlLenkoski2012}.
+
+Using our \ac{bma} approach, we examine how 37 different factors explain the differences in cross-country wealth inequality among 73 countries. We focus on a number of economic, financial, institutional, regulatory, political and policy factors, such as education, financial development, government policies, technological progress, entrepreneurship and macroeconomic stability. To capture wealth inequality, we use the wealth Gini coefficient from \ac{cswd}, constructed using the methodology of \citet{daviesetal2017}. The \ac{cswd} is the only available dataset with sufficient country coverage. We also add a set of indicators for financial development by \citet{svirydzenka2016introducing}, which employ the most densely available series from \ac{gfdd} to capture various characteristics of financial systems. We include these measures to reflect the assumptions made by the theory, in which savings, which depend on financial markets, and financial development are the main drivers of wealth inequality.
+
+Examining our global sample, we find that several factors are robustly related to wealth inequality. We find that financial development is an especially important determinant of wealth inequality across countries. Our results suggest that finance exerts a complex effect on wealth inequality. Whereas countries with more finance (i.e., large financial markets and financial institutions) exhibit greater wealth inequality, more efficiency and greater access to finance is associated with less wealth inequality. In general, this evidence supports the notion that sound financial systems contribute to lower wealth inequality. According to our results, the empirical importance of finance for wealth inequality suggests that theoretical models should more thoroughly examine the complex links between finance and wealth.
+
+Our results also suggest that education reduces wealth inequality. Education decreases the gap between the wealthy and poor, corresponding to the findings by \citet{dabla2015causes} regarding the determinants of income inequality.\footnote{However, note that the theoretical effect of education on inequality is ambiguous. \citet{scheidel} discusses the channels via which education -- primarily through assortative mating and the elite school system being disproportionally less accessible to children from poor families -- amplifies inequality.} Wealth inequality is also lower in countries with more redistribution, as measured by the difference between the market and after-tax income Gini coefficients. Finally, globalization, as proxied by trade openness, and the extreme form of political instability, as proxied by the number of wars, tend to increase wealth inequality. 
+
+The remainder of the paper is organized as follows. Section \ref{sec:literature} reviews the literature on wealth inequality. Section \ref{sec:data} presents the data, and \ref{sec:BMA} introduces the \ac{bma}. We provide the results in section \ref{sec:results} and conclude in section \ref{sec:conclusion}. Additional robustness checks are available in Section \ref{sec:app_rch} in the Appendix.
+
+\section{Related literature}
+\label{sec:literature}
+%Our research is linked to two branches of the literature. The first branch attempts to account for the stylized facts about the distribution of wealth using dynamic quantitative models. \citet{DENARDI2017280} provide a survey of this class of models since their genesis up to the recent contributions. The latest updates allow for a close fit of empirical distributions in selected countries. Inquiries into the determinants of wealth inequality must build on the measurement of the overall level and distribution of wealth, which is the topic of the second branch to which our paper relates. \citet{roine2015long} summarize the literature regarding measurement of the distribution of wealth. 
+
+%\subsection{Quantitative models of the distribution of wealth}
+Wealth inequality is typically analyzed within the theoretical framework of \citet{bewley1977permanent} and \citet{Ayiagari1994}. This framework relaxes the assumption of efficient economies and allows for, among other aspects, incomplete markets. The agents within the economy face a stochastic process of labor earnings and optimize consumption-saving behavior in incomplete markets. Additional specifications include restrictions on saving assets or borrowing constraints. Among other macroeconomic phenomena, the models can help us to understand the dynamics of the equilibrium distributions of consumption, savings, and wealth \citep{BENHABIB2015489}.
+
+The basic mechanism in the Bewley model relies on the environment in which agents save to self-insure against idiosyncratic labor-earning shocks. This precautionary motive to save is the primary driver of wealth accumulation. The basic version of the model has severe limitations. The ability to self-insure increases with the wealth/earnings ratio. The saving rate thus decreases and eventually turns negative if individual wealth is sufficiently greater than labor earnings. In other words, the basic setup implies negative saving rates for the rich. It also overstates the fraction of the population that does not save at all. These features of the model are in contrast with the data in \ac{us}, in which we observe high saving rates for the rich, and the share of agents without savings is very small \citep{DENARDI2017280}. 
+
+For this reason, the saving motives are extended to account more accurately for the actual dynamics of wealth accumulation and distribution. Some of the extensions introduce bequests and the transmission of human capital across generations \citep{nardi2004wealth,de2014bequests}, heterogeneity in both time preferences and risk aversion \citep{HENDRICKS2007}, earnings risk \citep{castaneda2003}, saving for out-of-pocket medical expenses \citep{kopecky2014impact}, heterogeneity in rates of return \citep{lusardi2017optimal,BENHABIB2015489}, or entrepreneurship motives for saving \citep{cagetti2006entrepreneurship}. The extensions generally help the model fit actual data. The various forces that we mention above have been primarily studied separately, which makes it difficult to evaluate their relative importance. Therefore, \citet{DENARDI2017280} call for complex models that account jointly for varying saving motives.
+
+%\subsection{Wealth inequality measurement}
+Empirical analysis of wealth inequality has received much less attention compared with income. Even though this may seem surprising given the quantitative importance of wealth, it is largely because the measurement of wealth is more complicated than the measurement of income \citep{zucman2018}.
+
+Private wealth is of utmost importance for individual  decisions regarding investment, especially in an environment with asymmetric information and binding credit constraints. The consequences of the distribution of wealth are important in theories explaining the different speeds of development across countries \citep{roine2015long}. Researchers sometimes substitute wealth patterns with income distributions, but such replacements are far from perfect given that wealth and income distributions are typically very different \citep{bagchi2015does}. One of the stylized facts is that the wealth distribution is much more concentrated than the income distribution. Figure \ref{fig:wealthincome_comp_oecd} in the Appendix illustrates this difference for the OECD countries with the most unequally distributed income. We can also observe countries with relatively high income inequality and low wealth inequality, and \textit{vice versa}.
+
+The lack of empirical literature regarding wealth inequality is primarily caused by data limitations, although some recent attempts to map both historical and current wealth patterns have emerged. The main sources of wealth data include household surveys, wealth tax returns, estate tax returns, the investment income method (jointly examining capital income and the net rate of return), and the \textit{rich lists} assembled by various journals \citep{davies2000distribution}. 
+
+In their survey, \citet{roine2015long} combine different sources of data and provide a long-run perspective on wealth inequality in advanced economies for which data are available.\footnote{Australia, Denmark, Finland, France, Netherlands, Norway, Sweden, Switzerland, \ac{uk}, and the \ac{us}.} The data for these countries are typically available for the 20th century (and sometimes even earlier) but often at a frequency lower than yearly and with some missing data. Typically, the data indicate that wealth inequality has decreased since World War I, continued on a downward trend (or stagnated) and then increased somewhat since the 1980s. However, the increase in wealth inequality after the 1980s is most dramatic for some countries, such as the \ac{us}, where it nearly reverted the top wealth shares to their values from before the Great Depression \citep{piketty2014}. 
+
+The existing single case studies of countries include, among others, \citet{SaezZucman2016} and \citet{kopczuksaez2004}, who document the dynamics of wealth inequality in the \ac{us} since 1913 based on capitalized income data and estate tax returns, respectively. \citet{dell2007income} examine the evolution of wealth shares in Switzerland. \citet{roine2009wealth} document the Swedish case, and \citet{katic2016top} cover the wealth patterns in Australia. For a thorough overview, we refer to \citet{roine2015long}.
+
+\citet{daviesetal2017,daviesetal2011,davies2000distribution} are important contributions in terms of measuring wealth inequality. In order to examine global wealth inequality, they provide wealth inequality measures (Gini coefficients) for a large number of countries. They explore a shorter time span, only examining the changes in global wealth patterns since 2000, and find that global wealth inequality decreased between 2000 and 2007, but then the trend reversed, and inequality has since been steadily rising. They also show that the share of financial assets strongly affects the changes in wealth inequality \citep{daviesetal2017}. We provide more details of their work, especially regarding the wealth inequality levels in individual countries, in the section about data below.
+
+\section{Data}
+\label{sec:data}
+We construct a rich dataset of 73 countries and 37 explanatory variables to study the determinants of the wealth distribution. The selection is based on the aforementioned theoretical models and the empirical studies examining income inequality. Our methodological choice allows us to be generous with the inclusion of regressors, and therefore, we can capture a variety of different country characteristics. 
+
+Our dependent variable is the Gini index based on the wealth distribution coming from the \ac{cswd} based on the methodology of \citet{daviesetal2011,daviesetal2017}.\footnote{This dataset has been recently used by \citet{anand} to document recent trends in wealth inequality and by \citet{islam} to examine the effect of wealth inequality on economic freedom and democracy.} They use the methodology to estimate the world distribution of wealth and consequently provide estimates for single countries. The \ac{cswd} is provided at a yearly frequency from 2010 onwards. We take the average of available observations of the index (2010-2016) to reduce possible year-on-year stock market capitalization swings or significant changes in the valuation of nonfinancial assets. We describe this dataset more thoroughly in subsection 3.1.
+
+We supplement the data about wealth with a large number of potential variables that could be driving inequality. These cover economic, financial, institutional, political, social and cultural aspects of the countries in our sample. It is difficult to rely on similar studies in the choice of regressors, since only a few papers on the same topic exist. To certain extent, we motivate the selection of our explanatory variables based on the studies investigating the determinants of income inequality and discussing the possible links between income inequality and wealth inequality \citep{roine2015long,de2017finance}. We average the data over the period of their availability, which is typically from 1980 to 2009. The complete list of the explanatory variables along with their description and sources is available in Table \ref{app:data} in the Appendix.
+
+We focus on financial development and its effect on the distribution of wealth within the economy. There are more than 100 indicators available in \ac{gfdd} by the \ac{wb}, capturing specific features of financial development. Building on the framework by \citet{Cihaketal2013}, who describe four main dimensions of financial systems -- depth, efficiency, stability, and access -- \citet{svirydzenka2016introducing} constructs aggregate indexes representing these dimensions using the most densely available series in the database. Furthermore, \ac{gfdd} allows for not only distinguishing between the different dimensions of financial development but also ascribing these dimensions to the banking sector and financial markets separately. Except for stability and access, for which we only control for variables representing the banking industry due to data limitations, we take advantage of this distinction in our analysis.
+
+Table \ref{tab:components} lists the components of our financial indexes. Their construction follows standard procedures. The series are normalized and then aggregated into the index using a weighted linear average. The weights come from principle components analysis, and they are thus proportional to the relative importance of the underlying series in explaining the variance of the index. We limit the index data to a period for which at least one of the underlying series used for construction of the index is available.\footnote{Originally, \citet{svirydzenka2016introducing} imputes the value of the indices using other available data to provide complete time series for all of the indices since 1980. Due to missing data for some components in the early periods, she imputes some of the indices. As an example, she approximates access to financial institutions by the series capturing efficiency or depth. In order not to mix up these concepts, we must impose conditions on the raw data availability.} We follow the same procedure as with other explanatory variables, i.e., take averages of the series before 2009.
+%
+%
+\begin{table}[ht!]
+\small
+\caption{Underlying Components of Financial Development Indexes}
+\label{tab:components}
+\centering
+\begin{tabular}{ll}
+  \toprule
+  \textsc{Indicator} & \textsc{Measure} \\
+  \midrule
+  \multicolumn{2}{l}{\textbf{Financial institutions}} \\
+  \midrule
+  \multirow{2}{*}{Access} 	& Bank branches per 100,000 adults \\
+  							& ATMs per 100,000 adults \\
+  \midrule
+  \multirow{6}{*}{Efficiency}		& Net interest margin \\
+  							& Lending-deposits spread \\ 
+  							& Noninterest income to total income \\
+  							& Overhead costs to total assets \\
+  							& Return on assets \\
+  							& Return on equity \\
+		
+  \midrule
+  \multirow{4}{*}{Depth}	& Domestic private credit to the real sector to the GDP \\
+  							& Pension fund assets/GDP \\
+  							& Mutual fund assets/GDP \\
+  							& Insurance premiums life and nonlife/GDP \\
+  \midrule
+  \multicolumn{2}{l}{\textbf{Financial markets}} \\
+  \midrule
+  \multirow{6}{*}{Depth} 	& Stock market capitalization/GDP \\
+  							& Stocks traded/GDP \\
+  							& International debt securities of government/GDP \\
+  							& Total debt securities of financial corporations/GDP \\
+  							& Total debt securities of nonfinancial corporations/GDP \\
+  \midrule
+  Efficiency			& Stock market turnover ratio (stocks traded/capitalization) \\
+  \bottomrule
+\end{tabular}
+\end{table}
+%
+%
+%
+Table \ref{tab:descstat} presents the descriptive statistics for the wealth inequality and financial development indicators, whereas Table \ref{tab:corrmat} reports a correlation matrix for the financial variables and wealth inequality. It is important to realize that contrary to common perception, the correlations between financial variables are far from unity, with the only exception of access and depth, suggesting that different variables convey different information. Wealth inequality is correlated with financial variables, positively with depth and negatively with access and efficiency.
+%
+%
+\begin{table}[ht!]
+\small
+\centering
+\caption{Finance and Wealth Inequality: Descriptive Statistics}
+\label{tab:descstat}
+\begin{threeparttable}
+\begin{tabular}{lcccc}
+  \toprule
+							& Min & Max & Mean & Std. dev \\ 
+  \midrule
+  Wealth inequality	& 53.9 & 88.6 &  72.94 & 6.54  \\ 
+  Access (FI)		& 0.015 & 0.964 & 0.336 & 0.259 \\ 
+  Efficiency (FI)   & 0.280 & 0.765 & 0.584 & 0.123 \\ 
+  Depth (FI)		& 0.022 & 0.861 & 0.306 & 0.239 \\ 
+  Depth (FM) 		& 0.004 & 0.732 & 0.220 & 0.203 \\ 
+  Efficiency (FM)	& 0.012 & 0.953 & 0.348 & 0.260 \\ 
+  \bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item Note: FI - financial institutions, FM - financial markets.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+%
+%
+\begin{table}[ht!]
+\small
+\centering
+\caption{Finance and Wealth Inequality: Correlations}
+\label{tab:corrmat}
+\begin{threeparttable}
+\begin{tabular}{lcccccc}
+  \toprule
+  Wealth inequality & 1.00 &  & & & & \\
+  Access (FI)  & -0.20 & 1.00 &  & & &    \\ 
+  Efficiency (FI) & -0.18 & 0.29 & 1.00 & & &  \\ 
+  Depth (FI)  & 0.08 & 0.73 & 0.48 & 1.00 &  &   \\ 
+  Depth (FM)  & 0.19 & 0.62 & 0.45 & 0.91 & 1.00 &   \\ 
+  Efficiency (FM)  & 0.02 & 0.47 & 0.12 & 0.51 & 0.58 & 1.00   \\ 
+  \bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item Note: FI - financial institutions, FM - financial markets.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+%
+%
+
+\subsection{\ac{cswd}}
+There are several sources for wealth data, with varying country and time coverage. \ac{wid} provides longer time series regarding wealth distribution for the \ac{us}, Russia, the \ac{uk}, and France. The coverage significantly improves\footnote{\ac{wid} currently (2018) provides time series of varying length for 21 countries.} for aggregate stocks of wealth and wealth-income ratios, but these variables themselves do not provide information about the wealth distribution. The \ac{oecd} also systematically collects data regarding household wealth and its distribution since 2009. Information about the wealth share of the top decile and top percentile of the distribution is available for other metrics. However, the sample is constrained to the \ac{oecd} member countries, and the resulting country-period sample does not allow for thorough analysis at the global level. Finally, the \ac{cswd} is a global yearly dataset regarding wealth and its distribution. In addition to the mean wealth levels for individual countries and different world regions, it provides data about the distribution in terms of Gini coefficients and top wealth shares.
+
+The wealth distributions in the \ac{cswd} result from the methodology by \citet{daviesetal2017}. The authors work with the definition of net worth --- the sum of the marketable value of financial and nonfinancial assets (housing and land), from which debts are subtracted. Financial assets include private pensions, but this quantity does not consider entitlements for public pensions. Whereas there is uncertainty related to future pension payments, \citet{bonke2017} document that under no policy change, wealth inequalities decrease if they account for private, occupational, and public pensions. The \ac{cswd} focuses on the wealth of individuals aged 20+ years. Several arguments for addressing individuals rather than households exist. First, personal assets and liabilities are usually attached to individuals, and their commitment does not depend on household membership. Second, even when some assets are shared, household members neither have equal roles in management of these assets nor benefit from their eventual sale. Third, the \textit{de facto} composition of the household might not correspond to the survey questionnaires; older children might live away from home, which also relates to the different household structures across countries. Finally, in contrast with the number of adults, the exact number of households in many countries is unknown. Generally, the implications of this choice of unit of comparison are uncertain. Although household wealth appears to be distributed more equally than that of individuals \citet{atkinson2007top}, some contributions show there are no important differences in Sweden and the \ac{us} \citep{roine2009wealth,kopczuksaez2004}. 
+
+The construction of wealth distributions in the \ac{cswd} follows three steps. Initially, the average level of wealth is established for individual countries. \ac{hbs} data are the primary source for wealth levels.\footnote{\ac{hbs} data are available for 47 countries. For many countries, data regarding nonfinancial wealth are missing, and thus, the basic data must be supplemented by econometric estimations. For more details about the estimated regressions for financial assets, nonfinancial assets, and liabilities, we refer to \citet{daviesetal2017}.} The second step addresses the wealth pattern within countries. Based on the wealth distribution in countries for which the data are directly available (31 countries), \citet{daviesetal2017} establish a relationship between wealth and income distribution to provide an estimate of the wealth pattern in the remaining countries for which they observe the distribution of income. Finally, they augment the resulting wealth distribution by using the lists of billionaires by Forbes. The common sources of wealth distribution likely underestimate the wealth holdings of the very rich, and this results in a distorted top-tail of wealth spectrum. Therefore, \ac{cswd} employs Forbes data to adjust the top-tail of the distribution. 
+
+\section{Bayesian Model Averaging}
+\label{sec:BMA}
+We describe \ac{bma} in this section. %and draw heavily on \citet{hasan2016}.
+One of major benefits of \ac{bma} is the possibility to deal with the regression model uncertainty. This uncertainty arises in cases of competing theories, which suggest different regression specifications. In addition, \citet{Koop2003} warns about risks related to general-to-specific modeling, i.e., starting with a more general regression model and narrowing down the specification by sequentially dropping the least significant regressors in order to obtain the ``true'' model. \citet{Koop2003} shows that the risk of arriving at a model different from ``true'' model increases with the number of sequences of eliminating the least significant variables. On the other hand, BMA does not select the ``true'' model but rather averages all possible regression models, assigning greater weight to ``better'' models based on their likelihood. Therefore, the \ac{bma} addresses the regression model uncertainty inherent in many economic theories. 
+
+We provide a detailed description of standard BMA model in Section \ref{sec:app_bma} in the Appendix. In what follows, we present the reasoning for the choices of our parameter and model priors as well as the reasoning how we address potential endogeneity concerns. 
+
+\subsection*{Priors}
+\label{sec:priors}
+The \ac{bma} methodology requires determining two types of priors: $g$ on the parameter space and $p(M_{i})$ on the model space. The priors are crucial in determining the posterior probabilities \citep{FeldkircherZeugner2009,CicconeJarocinski2010,Liangetal2008}. In the following subsections, we present the prior structure and support our choices.
+
+\subsubsection*{Parameter Priors}
+We use Zellner's g prior structure, which is a common approach in the literature. The prior structure assumes that the priors on the constant and error variance from equation \ref{eq:OLSsub} are evenly distributed, $p(\alpha_{i}) \propto 1$ and $p(\sigma) \propto \sigma^{-1}$. \citet{Zeugner2011} notes that this is very similar to the normal-gamma-conjugate model accounting for proper model priors on $\alpha$ and $\sigma$ described, for example, in \citet{Koop2003}, with practically identical posterior statistics. 
+
+We assume that the $\beta_{i}$ coefficients follow the normal distribution, and we must formulate beliefs regarding their mean and variance before examining the data. We follow standard practice and assume a conservative mean of 0 to reflect the lack of prior knowledge regarding the coefficients. Zellner's g defines their variance structure $\sigma^{2}(g(X_{i}'X_{i})^{-1})$. Together, we have the coefficient distribution, which depends on the prior $g$:
+
+% Coefficient prior - Zellner's g
+\begin{equation}
+\beta_{i}\vert g \sim\ N(0, \sigma^{2}(g(X_{i}'X_{i})^{-1}) 
+\end{equation}
+%%
+The prior variance of the coefficients is proportional to the posterior variance $(X_{i}'X_{i})^{-1}$ estimated from the sample. The parameter $g$ denotes how much weight we attribute to the prior variance, as opposed to the variance observed in the data \citep{FeldkircherZeugner2009}. Selecting a small $g$ results in low variance in the prior coefficients and thus pushes the coefficients to zero. Conversely, a large $g$ attributes higher importance to the data and expresses researchers' uncertainty regarding zero $\beta_{i}$ coefficients \citep{Zeugner2011}. Note that with $g \rightarrow \infty$, $\beta_{i} \rightarrow \beta^{OLS}_{i}$. Popular choices include \ac{uip}, BRIC\footnote{$g = \max({N, K^{2}})$}, and hyper-g\footnote{$\frac{g}{1+g} \sim Beta (1, \frac{a}{2} - 1)$, where $a \in (2,4]$, i.e. Beta distribution with mean $\frac{2}{a}$} parameter prior.
+% \begin{itemize}
+% 	\item \ac{uip}; $g = N$.
+% 	\item BRIC; $g = max\{N, K^{2}\}$.
+% 	\item hyper-g; $\frac{g}{1+g} \sim Beta (1, \frac{a}{2} - 1)$, where $a \in (2,4]$, which is a Beta distribution with mean $\frac{2}{a}$.
+% \end{itemize}
+%
+Whereas the first two are known as ``fixed-g'' priors for the parameter prior set for all the models under consideration, hyper-g allows the researcher to update the prior for individual models in a Bayesian nature and therefore limits the unintended consequences of prior selection based on posterior results. Note that setting $a=4$ corresponds to the \ac{uip}, whereas $a=2$ concentrates the prior mass close to unity, corresponding to $g \rightarrow \infty$. For more details about hyper-g, see \citet{Liangetal2008}.
+
+We employ the so-called hyper-g prior to estimate the baseline models, following \citet{FeldkircherZeugner2009}, who suggest that using model-specific priors leads to a more stable posterior structure. We then check the robustness of the results by applying the \ac{uip} parameter prior.
+
+\subsubsection*{Model Priors}
+\citet{MoralBenito2012} states that the most popular setting in the \ac{bma} literature is the binomial distribution, where each of the covariates is included in the model with a probability of success $\theta$. The prior probability of model $M_{i}$ with $k_{i}$ regressors given $\theta$ is then
+%%
+\begin{equation}
+p(M_{i})=\theta^{k_{i}}(1-\theta)^{K-k_{i}}
+\end{equation}
+%%
+A standard setting is $\theta=\frac{1}{2}$, which assigns equal probability $p(M_{i}) = 2^{-K}$ to all of the models under consideration. This model prior is also known as the uniform model prior. Assuming that different values of $\theta$ can shift the prior model distribution to either smaller or larger sizes (see \citet{Zeugner2011}), we focus on models using the uniform model prior, which is typically employed in \ac{bma} applications \citet{Fernandezetal2001}.
+
+A few other model priors can be found in the literature, and we also use them for sensitivity checks of our results. In particular, we employ the collinearity-adjusted dilution model prior described by \citet{george2010}. Whereas the uniform model prior assumes that the probability of inclusion of one regressor is independent of the inclusion of another one, some regressors are usually correlated. A simple method for addressing the dilution property is to account for such collinearity and adjust the model probabilities by weighting them with the determinant of the correlation matrix, $\vert R_{i} \vert = \vert X_{i}^{}X_{i}^{\prime} \vert$. In practice, the collinearity-adjusted dilution model prior takes the following form:
+%
+\begin{equation}
+p(M_{i})=\vert R_{i} \vert \theta^{k_{i}}(1-\theta)^{K-k_{i}}
+\end{equation}
+%
+where $R_{i}$ is the correlation matrix of model $i$ under consideration. If the variables in the examined model are orthogonal, the determinant $\vert R_{i} \vert$ goes to 1. On the other hand, if the variables are highly collinear, it goes to 0 and consequently down-weights models with redundant regressors.
+
+\subsection*{\ac{ivbma}}
+\citet{KarlLenkoski2012} present an approach to address model uncertainty in the instrumental variable framework. In their paper, they use \acp{cbf} factors to compare models within the Gibbs sampling algorithm to efficiently compute the posteriors. In contrast with \citet{lenkoski2014two}, who rely on approximation of model probabilities using \ac{bic}, \ac{ivbma} allows for a rigorous and fully Bayesian approach. The solution by \citet{koop2012bayesian} offers an alternative approach to simultaneously account for endogeneity and model uncertainty. Their method allows for more flexibility in the choice of prior distributions, and it is suitable for testing the identification of the estimated system. This flexibility complicates the estimation process by introducing an extremely large model space and complexity of the algorithm, which may manifest as difficulties in mixing. The authors are forced to introduce a tweak using a system of ``hot'', ``cold'', and ``super-hot'' models to improve on the mixing properties, which makes the method much more difficult to implement.
+
+We follow \citet{KarlLenkoski2012} in the concise exposition of the \ac{ivbma} framework. They start from a classical two-stage model:
+\begin{equation}
+\label{eq:ivbma1}
+%\pmb
+{Y} = {X} \beta + {W} \gamma + {\epsilon}
+\end{equation}
+%
+\begin{equation}
+\label{eq:ivbma2}
+{X} = {Z} {\delta} + {W} {\tau} + {\eta}
+\end{equation}
+%
+where
+%
+\begin{equation}
+\begin{pmatrix}
+\epsilon_{i} \\
+\eta_{i}
+\end{pmatrix}
+\sim \mathcal{N}_{2}(0, {\Sigma})
+\end{equation}
+%
+and
+%
+\begin{equation}
+{\Sigma} = 
+\begin{pmatrix}
+ \sigma_{11} & \sigma_{12} \\
+ \sigma_{21} & \sigma_{22}
+\end{pmatrix}
+; \sigma_{12} = \sigma_{21} \neq 0
+\end{equation}
+
+In this system of equations, ${Y}$ is the response variable, ${X}$ is the endogenous factor, and ${W}$ represents a matrix of other explanatory variables. ${Z}$ is a matrix of instrumental variables, whereas ${\delta}$, ${\gamma}$ and ${\tau}$ are the corresponding parameter matrices, and $\beta$ is a scalar. For ease of exposition of the model, we include only one endogenous variable, but extension to multiple endogenous variables can be readily performed.
+
+The \ac{ivbma} algorithm works by sequentially updating the first- and second-stage models by drawing from their respective neighborhood models and comparing the conditional probabilities of the candidate models. In a manner resembling the comparison of model probabilities within the MC3 sampler presented in Appendix \ref{sec:mc3}, the models are accepted and parameters updated if and only if the conditional probability of the suggested model is greater than the conditional probability of the current one. The error matrix $\Sigma$ is updated after each round of considering new candidate models in both stages. For more details about the algorithm and algebraic exposition of \acp{cbf}, we refer to the original paper by \cite{KarlLenkoski2012}.
+
+%
+%
+%
+%
+%
+
+\section{Results}
+\label{sec:results}
+In this section, we first present several scatter plots to visualize the relations between financial development indicators and wealth inequality. Second, we present \ac{bma} results regarding the determinants of wealth inequality, third, we present the results for restricted samples of high- / low- income countries, and fourth, we address endogeneity issues using \ac{ivbma}.
+
+\subsection{Baseline estimation}
+Figure \ref{fig:findev} offers an initial insight into the relationship between financial indexes and wealth inequality. The scatter plots show an expected pattern.  We observe efficiency of intermediation and access to financial services to be negatively correlated with inequality. On the other hand, Figure \ref{fig:findev} suggests that the depth of financial markets is higher in countries with higher wealth inequality. The depth of financial institutions exhibits a slightly weaker but still positive relationship. Overall, the scatter plots suggest that there is some relation between financial development indicators and wealth inequality and that this relation is complex, i.e., some aspects of financial development may contribute to greater wealth inequality, whereas other aspects exert an opposite effect.
+
+\begin{figure}[ht]
+	\caption{Finance and Wealth Inequality}
+    \label{fig:findev}
+    \begin{measuredfigure}
+    \centering
+	\includegraphics[width=0.85\textwidth, keepaspectratio]{figures/plots_findev.eps}
+	\floatfoot*{\hspace{4em}Note: Selected financial development indicators.}
+	\end{measuredfigure}
+\end{figure}
+
+% \begin{figure}[ht]
+% \centering
+% \includegraphics[width=0.85\textwidth, keepaspectratio]{figures/plots_highpips.eps}
+% \caption{Wealth inequality and selected explanatory variables}
+% \label{fig:highp}
+% \end{figure}
+
+Table \ref{table:res1} presents our BMA results regarding the determinants of wealth inequality. We present the explanatory variables sorted by their \ac{pip} values and interpret the results in accordance with \citet{kass1995bayes}, who present a conventional rule of thumb to evaluate the \ac{pip}. When the \ac{pip} is lower than 50\%, there is evidence against the effect, \ac{pip} between 50\% and 75\% suggest a weak evidence for the effect, \ac{pip} over 75\%, but less than 95\% means a “positive” evidence for the effect, in case of \ac{pip} higher than 95\%, but less than 99\% there is strong evidence for the effect, and \ac{pip} over 99\% provides decisive evidence for the effect.
+
+According to our results, only a handful regressors robustly determines the cross-country variation in wealth inequality and exhibit \acp{pip} greater than 0.5. Financial development indicators represent nearly half of these regressors, suggesting that finance is a crucial factor for understanding wealth inequality. Examining our global sample, our results suggest that cross-country differences in wealth inequality are a combination of effects stemming from finance, globalization, education, advances in agriculture and redistribution. But quantitatively, how important is this set of regressors in explaining wealth inequality? If we estimate the simple OLS regression with regressors included in the mode with the highest \ac{pmp}, we find the corresponding value of R-squared to be 0.57 (adjusted R-squared to be 0.52). This result suggests that we can explain approximately half of the variation in the cross-country differences in wealth inequality using only the eight most relevant regressors.\footnote{All regressors are statistically significant at the 1 or 10 percent level and exhibit signs of the coefficient estimates identical to those reported in Table \ref{table:res1}. Alternatively, we estimate the model by OLS using the regressors with \acp{pip} greater than 0.5 in the baseline \ac{bma}. The results again correspond to the \ac{bma} estimate. We report the output of both regressions in Table \ref{res:ols} in the Appendix.} We discuss the effects of individual regressors in detail below.
+
+The variables with high \acp{pip} exhibit the expected qualitative effects on wealth distribution. The greater efficiency of financial intermediation and better access to the financial institutions results in a more uniform distribution of wealth. This finding is broadly in line with the conclusion of \citet{claessens2007finance} regarding the determinants of income inequality, who assert that access to financial resources is a key driver in reducing income inequality rather than the depth of the financial market. The result of \citet{claessens2007finance} also accords with the lower PIP of financial institutions depth in our model. 
+
+According to our results, large financial markets (i.e., more capitalized stock markets and greater debt securities markets) propagate differences in wealth. Stock price booms are likely to increase wealth inequality because of the composition of household wealth, as stocks are typically owned by rich households. \citet{kuhn} provide new estimates of wealth inequality in the US from 1949--2016 based on archival data from the Survey of Consumer Finances and examine the evolution of wealth over time. Their results are in accordance with ours: stock price booms indeed contribute to greater wealth inequality.  
+
+In addition, one could argue that our result regarding the effect of the size of financial markets on wealth inequality corresponds to recent findings suggesting that too much finance is harmful to growth \citep{Arcandetal2012,CecchettiKharroubi2012,LawSingh2014} and that it is important to disentangle quantity and quality of finance when examining the effect of finance on growth \citep{hasan2016}. However, this analogy is only partially valid because whereas we typically think of greater economic performance as a positive phenomenon, there is a uncertainty about what is the `optimal' level of wealth inequality. 
+
+Outward orientation capturing the openness of the economy leads to higher levels of wealth inequality. Large importance and qualitative effect correspond to the earlier findings, such as those of \citet{dabla2015causes}, which claim that globalization and increasing exposure to the outside world contributes to greater within-country inequality. If globalization increases growth, then this result implies that the globalization benefits some economic agents more than others. For example, \citet{dabla2015causes} and \citet{milanovic2016global} mention the skill premium related to technological progress, which leads to excessive earnings and widens inequality. Nevertheless, our results provide little evidence that technological progress increases wealth inequality. We use a comprehensive index of technological progress developed by \citet{comin}, but as we can observe from Table \ref{table:res1}, its PIP is very low. We attribute our result regarding the effect of technological progress on wealth inequality to the sample that we use. Our global sample covers countries with different degrees of economic development and technological progress, and it is likely that technological progress may play a greater role specifically in the most advanced countries. 
+
+Redistribution, which we define as the difference between the market and after-tax income Gini indexes, contributes to lower wealth inequality. This result can be interpreted as evidence indicating that government policies may in fact affect inequality despite the well-known difficulties regarding the taxation of top earners. Our results are broadly in line with those of \citet{jakobsen2018}, who find that the abolition of the Danish wealth tax in 1997 contributed to more wealth inequality by increasing the wealth of top earners. Interestingly, the political orientation of the government (as captured by the variable `left wing orientation') is not robustly related to wealth inequality. This result suggests that deeds (i.e., the actual level of redistribution) rather than words (i.e., stated political orientation) matter.\footnote{In one of the robustness checks, we also consider the relative redistribution (percentage reduction in market-income inequality due to taxes and transfers) Employing the alternative indicator of redistribution does not have any substantial impact on the other explanatory variables. The output of the estimation is available in Table \ref{table:relred}.}.
+
+Although the variable `number of war years' exhibits an inclusion probability of slightly less than 0.5, we find wars to be associated with higher wealth inequality. This result is at odds with previous evidence arguing that wars reduce inequality because of enormous capital destruction, inflation and sizable redistributive government programs (to finance the war); see, for example, \citep{piketty2014,milanovic2016global} and the references therein. However, this evidence focuses on the effect of war on inequality over time and focuses on substantial and long-lasting conflicts, such as World War I or II. Our regressions explain cross-sectional variation in wealth inequality, i.e., why inequality is higher in some countries than in others. In addition, our dataset regarding wars is based on the period after World War II, i.e., typically internal conflicts (civil wars) or conflicts involving a single or small number of countries. These conflicts have adverse macroeconomic effects, undermine the rule of law, cause violent confiscation of private property by militias and reduce trust in society, especially if these conflicts occur repeatedly \citep{bircanetal}. \citet{bircanetal} study the effect of internal violent conflicts on income inequality and also find inequality increases, but this effect is temporary, and later on, inequality falls slowly back to the steady state.
+
+\begin{table}[!ht]
+\footnotesize
+\centering
+\caption{Determinants of Wealth Inequality, BMA Estimation}
+\label{table:res1}
+\begin{threeparttable}
+\begin{tabular}{lrrr}
+  \toprule
+ & PIP & Post Mean & Post SD \\ 
+    \midrule
+  Financial institutions efficiency & 1.00 & -0.33651 & 0.11350 \\ 
+  Value added in agriculture & 1.00 & -0.51800 & 0.16188 \\ 
+  Access to financial institutions & 1.00 & -0.38266 & 0.15020 \\ 
+  Outward orientation & 0.87 & 0.20663 & 0.12371 \\ 
+  Education index (UN) & 0.79 & -0.26055 & 0.20440 \\ 
+  Financial market development & 0.77 & 0.34023 & 0.23533 \\ 
+  Redistribution & 0.51 & -0.10670 & 0.13963 \\ 
+  Number of war years & 0.48 & 0.06956 & 0.09701 \\ 
+  Net national savings & 0.42 & 0.08447 & 0.13021 \\ 
+  Economic freedom index (adjusted) & 0.35 & -0.08233 & 0.15183 \\ 
+  Financial institutions development & 0.33 & 0.14210 & 0.24598 \\ 
+  Natural resource rents & 0.29 & 0.04572 & 0.09402 \\ 
+  Net foreign direct investment & 0.25 & -0.03291 & 0.07552 \\ 
+  Average GDP growth & 0.22 & -0.02607 & 0.06759 \\ 
+  Labor market regulation & 0.16 & 0.01630 & 0.05386 \\ 
+  Leftwing orientation & 0.15 & -0.01239 & 0.04533 \\ 
+  Population density & 0.14 & -0.01540 & 0.05521 \\ 
+  Inflation & 0.12 & 0.01036 & 0.04442 \\ 
+  Government expenditures & 0.12 & 0.01311 & 0.05717 \\ 
+  Latin America dummy & 0.10 & 0.00987 & 0.04762 \\ 
+  Financial markets efficiency & 0.09 & -0.00706 & 0.04026 \\ 
+  Banking diversification & 0.09 & -0.00579 & 0.03217 \\ 
+  Rule of law & 0.09 & 0.01368 & 0.08087 \\ 
+  Active banking restrictions & 0.09 & -0.00612 & 0.03667 \\ 
+  Financial development index (EFW) & 0.07 & -0.00364 & 0.04464 \\ 
+  Public education expenditures & 0.07 & 0.00363 & 0.02903 \\ 
+  Revolutions and coups & 0.07 & 0.00250 & 0.02705 \\ 
+  Population growth & 0.07 & 0.00394 & 0.04154 \\ 
+  Bank capital regulations & 0.07 & -0.00323 & 0.02589 \\ 
+  GDP level in 1990 & 0.07 & -0.00809 & 0.07483 \\ 
+  Civ. liberties and pol. rights & 0.06 & -0.00322 & 0.04104 \\ 
+  Technological progress & 0.06 & -0.00596 & 0.06110 \\ 
+  Life expectancy & 0.05 & 0.00043 & 0.04581 \\ 
+  Financial openness (Chinn-Ito) & 0.05 & 0.00150 & 0.03218 \\ 
+  Business conditions & 0.05 & -0.00196 & 0.02568 \\ 
+  Value added in industry & 0.05 & -0.00030 & 0.02710 \\ 
+  Labor force participation & 0.04 & 0.00054 & 0.01815 \\ 
+  \midrule
+  \bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item Note: Dependent variable - average Gini index (wealth) 2010-2016, 73 observations, baseline (hyper-g parameter prior) 
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\clearpage
+\begin{figure}
+	\caption{Robustness Check: Different Prior Structure}
+	\centering
+	\includegraphics[width=0.9\textwidth]{figures/priors_comparison_compound.eps}
+	\label{fig:comp_compound}
+\floatfoot*{Note: Parameter and model prior comparison - compound indicators. Model 1: hyper-g, uniform; Model 2: UIP, uniform; Model 3: hyper-g, dilution; Model 4: UIP, dilution.}
+\end{figure}
+
+We report the baseline results, in which we employ the uniform model prior and hyper-g parameter prior, as described in section \ref{sec:BMA}. To provide robustness checks, we also use alternative parameter and model priors. Figure \ref{fig:comp_compound} presents a graphical illustration of our robustness checks. We estimate alternative specifications of the model using \ac{uip} and the dilution model prior described earlier. Overall, the results are similar. The optional priors slightly decrease \ac{pip} across the set of regressors, with the combined effect of \ac{uip} and dilution model prior having the largest effect. This slight overall decrease in inclusion probabilities is related to the smaller models dictated by the alternative prior structures, but the ordering of the variables in terms of \ac{pip} remains quite stable. The only exception to marginal decreases in the \ac{pip} is the effect of education, which decreases to less than 0.5 when we apply the dilution model prior in the estimation. This result could be partially explained by the design of this particular prior, which should down-weight variables that are highly correlated with others. We also tried other specifications with quadratic terms of financial indexes, interactions between the rule of law and financial indexes, and others.\footnote{For example, we investigate cases where we drop groups of variables as defined in Table \ref{tab:groups}. Interestingly, when we drop a group of low \ac{pip} variables, the results are stable. On the other hand, if we drop a group which contains variables with high \ac{pip}s, the results deviate from the baseline estimates. This could be due to the introduction of omitted variable bias in the latter case as dropping important regressors may severely affect coefficients on the remaining variables.} None of these additional regressors exhibited significant relevance in our model.\footnote{These additional estimation results are available upon request.}
+
+Next, we argue that the effect of finance on wealth inequality is complex and whereas some financial indicators decrease the inequality, other financial indicators increase it. But what is the overall effect of finance on wealth inequality? We take the estimated posterior means from Table \ref{table:res1} for the finance variables with PIP values greater than 0.5 (these are access to financial institutions (FIA), their efficiency (FIE), and the depth of stock market (FMD)) and multiply them by the corresponding country-specific values. Given the manner in which our explanatory variables are normalized, this multiplication is identical to examining the change in wealth inequality as a result of one-standard-deviation increases in FIA, FIE, and FMD. 
+
+We present the results of overall effect of finance on wealth inequality in Figure \ref{fig:finance_effect}. Even though we do not want to overemphasize the precision of our results, the estimated effect is negative for all countries in our sample, i.e., our results suggest that greater financial development reduces wealth inequality. Nevertheless, we observe some heterogeneity in the estimated effect across the countries. Interestingly, we observe the weakest decreasing effect of finance on wealth inequality for the \ac{us}.\footnote{Alternatively, we assessed the overall effect of finance on wealth inequality based on the estimation of the ordinary least squares model. We selected the explanatory variables that had PIP values in \ref{table:res1} greater than 0.5. The results are largely the same and are available upon request.}
+
+\begin{sidewaysfigure}
+\begin{center}
+\caption{Effects of individual financial development components on inequality}
+\includegraphics[width=0.95\textwidth]{figures/finance_effect.eps}
+\label{fig:finance_effect}
+\end{center}
+\end{sidewaysfigure}
+
+\subsection{High vs. low-income countries}
+We explore the non-linearity of the estimated effects by splitting our sample into two halves according to the level of GDP in 1990. Such an exercise, however, presents an issue for the estimation with the full set of explanatory variables as only 36 observations remain in each sample. To overcome this, we consider nine explanatory variables which occur in the top three models by their \ac{pmp} which gives us enough degrees of freedom for the estimation. 
+
+We present the results in Table \ref{tab:inc_comparison}. The estimated coefficients of explanatory variables have their expected signs. We observe some heterogeneity in terms of PIPs. We find that technological advancement in agriculture (value added in agriculture) and openness of the economy (outward orientation) are dominant factors for low-income countries, while they are less relevant for the group of high-income countries. This is expected result given the prominence of agriculture sector in developing countries. Wars matter both for low-income and high-income countries. Regarding the financial variables, depth of the financial market increases wealth inequality both in low-income and high-income countries. Other financial variables (access to finance and efficiency of financial intermediaries) reduce wealth inequality especially in high-income countries. This suggests that the role of finance for wealth inequality rises with economic development.  
+
+\begin{table}[htbp!]
+\caption{Estimates using the variables from the model with the highest posterior model probability and sample split into high- / low- income countries (based on GDP90)}
+\label{tab:inc_comparison}
+\centering
+\begin{tabular}{lrrrr}
+  \toprule
+  & \multicolumn{2}{c}{High-income} & \multicolumn{2}{c}{Low-income} \\
+  \midrule
+	 & PIP & Post. Mean & PIP & Post. Mean \\ 
+  \midrule
+  Financial market depth & 0.97 & 0.55171 & 0.66 & 0.21279 \\ 
+  Average GDP growth & 0.83 & -0.31499 & 0.23 & 0.00877 \\ 
+  Access to FI & 0.76 & -0.30279 & 0.27 & 0.04851 \\ 
+  Number of war years & 0.72 & 0.36526 & 0.62 & 0.09226 \\ 
+  FI efficiency & 0.60 & -0.22569 & 0.24 & -0.00668 \\ 
+  Redistribution & 0.56 & -0.16593 & 0.27 & -0.02704 \\ 
+  Outward orientation & 0.50 & 0.11034 & 1.00 & 0.36512 \\ 
+  Education index (UN) & 0.38 & -0.10648 & 0.32 & -0.04479 \\ 
+  Value added in agriculture & 0.29 & 0.03537 & 0.94 & -0.33730 \\ 
+   \bottomrule
+\end{tabular}
+\end{table}
+
+% \begin{figure}[ht!]
+% 	\caption{PIP comparison using the variables from the model with highest posterior model probability and sample split into high- / low-income countries (based on GDP90)}
+% 	\centering
+% 	\includegraphics[width=0.9\textwidth]{figures/low_high_inc_comparison.eps}
+% 	\label{fig:inc_comparison}
+
+% 	Source: Authors'
+% \end{figure}
+
+% \begin{table}[htbp!]
+% \caption{Estimates using the variables from the model with highest posterior model probability and restricted sample of low-income countries (based on GDP90)}
+% \label{tab:l_inc}
+% \centering
+% \begin{tabular}{lrrr}
+%   \hline
+% 	 & PIP & Post Mean & Post SD \\ 
+%   \hline
+%   Outward orientation & 1.00 & 0.36512 & 0.09174 \\ 
+%   Value added in agriculture & 0.94 & -0.33730 & 0.14182 \\ 
+%   Financial market depth & 0.66 & 0.21279 & 0.20351 \\ 
+%   Number of war years & 0.62 & 0.09226 & 0.09600 \\ 
+%   Education index (UN) & 0.32 & -0.04479 & 0.10874 \\ 
+%   Redistribution & 0.27 & -0.02704 & 0.08046 \\ 
+%   Access to financial institutions & 0.27 & 0.04851 & 0.16716 \\ 
+%   Financial institutions efficiency & 0.24 & -0.00668 & 0.05339 \\ 
+%   Average GDP growth & 0.23 & 0.00877 & 0.04433 \\ 
+%    \hline
+% \end{tabular}
+% \end{table}
+\clearpage
+
+\subsection{Endogeneity issues}
+In our baseline results, we address endogeneity issues by estimating the effect of lagged regressors on wealth inequality. While wealth inequality is based on the data between 2010-2016, the regressors are based on data prior 2010 and often cover the 1980s, 1990s or 2000s. Therefore, we followed the procedure typical for BMA literature \citep{christofides,feldkircherjimf,hasan2016}.  
+
+The question of endogeneity is, however, deeply ingrained in the finance-inequality nexus, and we want to provide additional evidence that the estimated effect of finance on wealth distribution is causal. There are reasons for caution. First, a wealth distribution that is more concentrated at the top may result in more power of incumbents, who lobby for funding of their projects using their political connections and thereby distort the market. Second, making the distribution of wealth more equal may lead to increased demand for financial services as more individuals seek to invest their savings or take up loans when their wealth provides a satisfactory collateral. If such development leads to increased supply of financial services through, for example, newly installed ATMs and opened institutions, it may manifest as better access to financial services \citep{beck2007finance}.
+
+To address the potential endogeneity of the relationship between wealth distribution and financial development, we apply \ac{ivbma}. This methodology suggested by \cite{KarlLenkoski2012} implements the idea of instrumental variables in a Bayesian framework. It is essentially a two-stage estimation in which model uncertainty is considered in both stages. In the robustness check, we set the depth of financial institutions and access to financial institutions endogenous, as we believe that from our set of financial indicators, these are most the ones most likely affected by the reverse causality issues presented previously.
+
+We employ genetic distance from the United States \citep{spolaore2009diffusion} along with a measure of financial liberalization as instruments. The financial liberalization proxy we construct relies on the components of \ac{efw} index by \citep{gwartney2017}. More specifically, we average the areas 3D, 4C, 4D, and 5A of the \ac{efw}. These represent freedom to own foreign currency accounts, black-market exchange rate premium, controls on the movement of capital and people, and credit market regulations. We refer to the authors of \ac{efw} for the details of individual components. Although the search for good instruments is a nontrivial exercise, we believe our choice satisfies the basic conditions. Genetic distance should be unrelated to wealth distribution\footnote{In our sample, the correlation is 0.06.}. Even if the primary cause of migration is more/less equal distribution of wealth, it would most likely not be sufficiently substantial to affect the genetic pattern in a particular country. Additionally, the components of our financial liberalization measure are exogenous to the wealth inequality as the change in wealth distribution is improbably to have direct effect on any of them. We follow \citet{estev} here, who treat foreign trade liberalization as exogenous.
+
+We check the strength of our instruments by examining the correlations and running simple OLS regressions of our endogenous variable on the instruments. The correlations of the instruments are greater than 0.5 in absolute terms, with the only exception being FID and genetic distance, for which it is -0.37. The regressions reveal strong significance of the instruments and the F-test statistics of the regressions are 35.43 and 19.95 for FIA and FID, respectively. Both values are well above 10, the rule of thumb proposed by \citet{staiger1997instrumental}. We have compared several additional instruments often used in the literature, including the ubiquitously used financial reform index by \citet{Abiadetal2008} and the legal origin of the countries, but the \ac{efw} measure turned out to be the strongest of the instruments. Our main \ac{ivbma} results rely on the just-identified case where we have two potential instruments for two potentially endogenous variables. We check the overidentification with Sargan test as introduced in \citet{lenkoski2014two}, where the Sargan p-value is an weighted average of p-values from individual combinations of first and second stage models weighted by their model probabilities. The values are only available for potentially overidentified cases, where the number of instruments considered in the first stage is higher than the number of assumed endogenous variables. The averaged p-value from these cases confirms the validity of instruments.
+
+Table \ref{table:res_endo} presents the results of the \ac{ivbma} estimation. The \acp{pip} of instrumented variables somewhat decrease, in the case of access to financial institutions slightly below 0.5, but it still remains among the most important regressors. We also confirm the positive effect of financial markets depth along with the high inclusion probability. The \acp{pip} cannot be directly compared with the baseline results due to differences in the estimation procedure. Whereas for the standard \ac{bma} we report the inclusion probabilities based on the analytical posterior probabilities of the top models, \ac{ivbma} reports the probabilities based on the sampler. The latter approach tends to downweight the \ac{pip} for the top and upweight it for the bottom regressors.\footnote{If we compare \ac{ivbma} output with the MC3 \acp{pip} from the baseline \ac{bma}, we obtain very similar values for both approaches.} Overall, the \ac{ivbma} estimation largely supports our baseline findings. 
+
+\begin{table}[!ht]
+	\footnotesize
+	\centering
+	\caption{Determinants of Wealth Inequality, IVBMA Estimation}
+	\label{table:res_endo}
+	\begin{threeparttable}
+	\begin{tabular}{lrrr}
+		\toprule
+		& PIP & Post. Mean & Post. SD\\ 
+		\midrule
+		Financial institutions efficiency & 0.85826 & -0.32431 & 0.18276 \\ 
+		Value added in agriculture & 0.78741 & -0.39918 & 0.27546 \\ 
+		Financial market depth & 0.62200 & 0.29196 & 0.32026 \\ 
+		Financial institutions depth & 0.55682 & 0.24718 & 0.39989 \\ 
+		Outward orientation & 0.52022 & 0.13647 & 0.15901 \\ 
+		Economic freedom index (adjusted) & 0.50242 & -0.18778 & 0.24043 \\ 
+		Education index (UN) & 0.46915 & -0.16719 & 0.23034 \\ 
+		Access to financial institutions & 0.45168 & -0.19051 & 0.31849 \\ 
+		Net national savings & 0.42093 & 0.11213 & 0.16687 \\ 
+		Redistribution & 0.39198 & -0.10184 & 0.15932 \\ 
+		Natural resource rents & 0.36756 & 0.08280 & 0.13856 \\ 
+		Number of war years & 0.36660 & 0.07267 & 0.11648 \\ 
+		GDP level in 1990 & 0.29348 & -0.03476 & 0.21811 \\ 
+		Latin America dummy & 0.25851 & 0.05039 & 0.11744 \\ 
+		Net foreign direct investment & 0.24740 & -0.04159 & 0.09389 \\ 
+		Technological progress & 0.24198 & -0.02756 & 0.15284 \\ 
+		Rule of law & 0.22111 & 0.00025 & 0.13277 \\ 
+		Life expectancy & 0.21608 & -0.02082 & 0.12509 \\ 
+		Value added in industry & 0.20523 & 0.03081 & 0.09693 \\ 
+		Civ. liberties and pol. rights & 0.17607 & 0.00152 & 0.08731 \\ 
+		Population growth & 0.17297 & 0.01557 & 0.08178 \\ 
+		Inflation & 0.17219 & 0.02180 & 0.07214 \\ 
+		Average GDP growth & 0.16884 & -0.01947 & 0.06804 \\ 
+		Population density & 0.15698 & -0.01672 & 0.06680 \\ 
+		Government expenditures & 0.15095 & 0.01087 & 0.06574 \\ 
+		Labor market regulation & 0.14337 & 0.01307 & 0.05424 \\ 
+		Financial openness (Chinn-Ito) & 0.13893 & -0.00881 & 0.06817 \\ 
+		Leftwing orientation & 0.13809 & -0.01337 & 0.04972 \\ 
+		Business conditions & 0.12686 & -0.00665 & 0.05531 \\ 
+		Financial markets efficiency & 0.12605 & -0.00358 & 0.05153 \\ 
+		Revolutions and coups & 0.12206 & 0.00728 & 0.04631 \\ 
+		Active banking restrictions & 0.11903 & -0.00620 & 0.04858 \\ 
+		Banking diversification & 0.11722 & -0.00860 & 0.04230 \\ 
+		Public education expenditures & 0.10759 & 0.00368 & 0.03795 \\ 
+		Bank capital regulations & 0.09251 & -0.00155 & 0.03023 \\ 
+		Labor force participation & 0.09011 & -0.00148 & 0.02810 \\ 
+		\bottomrule
+	\end{tabular}
+\begin{tablenotes}
+\item Note: Dependent variable - average Gini index (wealth) 2010-2016, 73 observations. Financial depth of and access to financial institutions as endogenous. Instruments: genetic distance, financial development index from Economic Freedom of the World.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\section{Concluding Remarks}
+\label{sec:conclusion}
+
+This paper makes a new contribution to the burgeoning literature about wealth inequality. Whereas the existing literature focuses largely on measurement of wealth inequality \citep{alvaredoetal2013,daviesetal2011,pikettyandzucman2014,SaezZucman2016}, we examine a wide array of possible determinants of wealth inequality. 
+
+Building the large cross-country dataset, we employ \ac{bma} to study the determinants of wealth inequality in order to address the regression model uncertainty. This uncertainty arises from the lack of an encompassing model of wealth inequality, which would dictate the exact regression specification to be estimated. As a side effect, using \ac{bma}, we can examine a large number of possible determinants of wealth inequality within a unifying framework. Therefore, we examine how different economic, financial, regulatory, political, social, and institutional variables affect wealth inequality.  
+
+Using our global sample, addressing endogeneity issues and subjecting our results to a number of robustness checks, we find that only a handful variables are robustly related to wealth inequality. Our results suggest that cross-country differences in wealth inequality arise due to a combination of the effects stemming from the financial sector, globalization, education, advances in agriculture and government redistribution. More specifically, our baseline estimation shows that there are seven regressors with PIP values greater than 50\%, and they explain approximately half of the cross-country differences in wealth inequality. 
+
+We find that finance plays an important role in wealth inequality. Out of seven aforementioned variables that are robustly related to wealth inequality, three of them capture the level of financial development. According to our results, finance exerts a complex effect on wealth inequality. Some financial characteristics increase inequality, whereas other financial characteristics, to the contrary, decrease it.
+
+Our results show that large financial markets (as proxied by the stock market capitalization and size of debt securities market type of variables) are associated with greater wealth inequality. This result follows from the composition effect, as it is typically rich households that participate in the stock markets \citep{kuhn}. On the other hand, our findings show that countries with better access to finance and more efficient financial intermediaries exhibit lower wealth inequality. Therefore, there is no natural tendency that financial development results into greater wealth inequality. On the contrary, when we take the average values of financial development measures, the overall effect of finance development on wealth inequality is negative (i.e., more financially developed countries associated with lower level of wealth inequality). 
+
+In addition, our results show that more education and greater income redistribution are associated with lower level of wealth inequality. Therefore, this result broadly suggest that governments can affect the inequality within their countries (either via education or taxation). In addition, we also find that (the lack of) political stability influences wealth inequality, as our results show that countries with war experience exhibit greater inequality. Finally, our results suggest that globalization but not technological development is likely to contribute to greater wealth inequality.
+
+\clearpage
+%
+\bibliographystyle{chicagoa}
+\bibliography{literature}
+%
+\clearpage
+%
+\appendix
+\section{Appendix}
+\label{sec:app}
+
+\renewcommand{\thesection}{A\arabic{section}}%
+\renewcommand{\thetable}{A\arabic{table}}%
+\renewcommand{\thefigure}{A\arabic{figure}}%
+\renewcommand{\theequation}{A\arabic{equation}}%
+\setcounter{equation}{0}%
+\setcounter{table}{0}%
+\setcounter{figure}{0}%
+
+\subsection*{Additional robustness checks}
+\label{sec:app_rch}
+\begin{table}[!ht]
+\footnotesize
+\centering
+\caption{Dependent variable - average Gini index (wealth) 2010-2016, 73 observations, UIP parameter prior}
+\label{table:res2}
+\begin{tabular}{lrrr}
+  \toprule
+ & PIP & Post Mean & Post SD \\ 
+  \midrule
+  Financial institutions efficiency & 0.99 & -0.36999 & 0.12386 \\ 
+  Value added in agriculture & 0.99 & -0.56485 & 0.18154 \\ 
+  Access to financial institutions & 0.98 & -0.44382 & 0.16204 \\ 
+  Financial market development & 0.84 & 0.44193 & 0.23922 \\ 
+  Outward orientation & 0.78 & 0.21853 & 0.14535 \\ 
+  Education index (UN) & 0.58 & -0.23984 & 0.24290 \\ 
+  Redistribution & 0.38 & -0.10095 & 0.15101 \\ 
+  Economic freedom index (adjusted) & 0.32 & -0.10501 & 0.18144 \\ 
+  Net national savings & 0.30 & 0.07686 & 0.13764 \\ 
+  Number of war years & 0.23 & 0.03833 & 0.08335 \\ 
+  Natural resource rents & 0.22 & 0.04549 & 0.10083 \\ 
+  Financial institutions development & 0.20 & 0.10354 & 0.23661 \\ 
+  Net foreign direct investment & 0.19 & -0.03276 & 0.08044 \\ 
+  Latin America dummy & 0.09 & 0.01404 & 0.05849 \\ 
+  Population density & 0.08 & -0.01162 & 0.05108 \\ 
+  Average GDP growth & 0.08 & -0.00950 & 0.04338 \\ 
+  Labor market regulation & 0.06 & 0.00671 & 0.03585 \\ 
+  Population growth & 0.06 & 0.00788 & 0.04715 \\ 
+  Inflation & 0.06 & 0.00568 & 0.03341 \\ 
+  GDP level in 1990 & 0.06 & -0.01404 & 0.08467 \\ 
+  Technological progress & 0.05 & -0.01188 & 0.07248 \\ 
+  Financial development index (EFW) & 0.05 & -0.00641 & 0.04430 \\ 
+  Financial markets efficiency & 0.05 & -0.00499 & 0.03332 \\ 
+  Leftwing orientation & 0.05 & -0.00400 & 0.02612 \\ 
+  Government expenditures & 0.05 & 0.00463 & 0.03646 \\ 
+  Banking diversification & 0.04 & -0.00316 & 0.02370 \\ 
+  Value added in industry & 0.04 & 0.00229 & 0.03279 \\ 
+  Life expectancy & 0.03 & -0.00160 & 0.03867 \\ 
+  Active banking restrictions & 0.03 & -0.00213 & 0.02262 \\ 
+  Revolutions and coups & 0.03 & 0.00178 & 0.02012 \\ 
+  Financial openness (Chinn-Ito) & 0.03 & -0.00137 & 0.02553 \\ 
+  Rule of law & 0.03 & 0.00093 & 0.03789 \\ 
+  Civ. liberties and pol. rights & 0.03 & -0.00131 & 0.02953 \\ 
+  Bank capital regulations & 0.03 & -0.00131 & 0.01725 \\ 
+  Public education expenditures & 0.03 & 0.00113 & 0.01817 \\ 
+  Business conditions & 0.03 & -0.00000 & 0.01732 \\ 
+  Labor force participation & 0.02 & 0.00028 & 0.01376 \\  
+  \midrule
+  \bottomrule
+\end{tabular}
+\end{table}
+
+\clearpage
+
+\begin{table}[!ht]
+\footnotesize
+\centering
+\caption{Dependent variable - average Gini index (wealth) 2010-2016, 73 observations, dilution parameter prior}
+\label{table:res3}
+\begin{tabular}{lrrr}
+  \toprule
+ & PIP & Post Mean & Post SD \\ 
+  \midrule
+  Financial institutions efficiency & 0.93 & -0.29559 & 0.14058 \\ 
+  Access to financial institutions & 0.88 & -0.35265 & 0.19165 \\ 
+  Financial market development & 0.85 & 0.38321 & 0.21129 \\ 
+  Value added in agriculture & 0.81 & -0.37066 & 0.23301 \\ 
+  Outward orientation & 0.66 & 0.15971 & 0.14225 \\ 
+  Number of war years & 0.41 & 0.06813 & 0.10412 \\ 
+  Net national savings & 0.40 & 0.10489 & 0.15200 \\ 
+  Net foreign direct investment & 0.40 & -0.06582 & 0.10158 \\ 
+  Education index (UN) & 0.33 & -0.12682 & 0.20519 \\ 
+  Natural resource rents & 0.32 & 0.06267 & 0.11045 \\ 
+  Redistribution & 0.32 & -0.08372 & 0.14239 \\ 
+  Latin America dummy & 0.25 & 0.04844 & 0.10292 \\ 
+  Average GDP growth & 0.20 & -0.02656 & 0.07126 \\ 
+  Value added in industry & 0.15 & 0.03229 & 0.09069 \\ 
+  Financial institutions development & 0.14 & 0.06411 & 0.17325 \\ 
+  Labor market regulation & 0.12 & 0.01228 & 0.04752 \\ 
+  Leftwing orientation & 0.11 & -0.00800 & 0.03714 \\ 
+  Economic freedom index (adjusted) & 0.11 & -0.03180 & 0.10542 \\ 
+  Inflation & 0.10 & 0.01006 & 0.04385 \\ 
+  Population density & 0.09 & -0.00999 & 0.04676 \\ 
+  Banking diversification & 0.09 & -0.00557 & 0.03201 \\ 
+  Financial development index (EFW) & 0.08 & -0.01339 & 0.05852 \\ 
+  Bank capital regulations & 0.06 & -0.00114 & 0.02308 \\ 
+  Labor force participation & 0.06 & -0.00002 & 0.02089 \\ 
+  Public education expenditures & 0.05 & 0.00208 & 0.02499 \\ 
+  Revolutions and coups & 0.05 & 0.00270 & 0.02436 \\ 
+  Government expenditures & 0.04 & 0.00506 & 0.03702 \\ 
+  Financial markets efficiency & 0.04 & -0.00350 & 0.02844 \\ 
+  Population growth & 0.04 & 0.00542 & 0.04010 \\ 
+  Active banking restrictions & 0.03 & -0.00191 & 0.02272 \\ 
+  Financial openness (Chinn-Ito) & 0.03 & -0.00266 & 0.02558 \\ 
+  Business conditions & 0.03 & 0.00043 & 0.01735 \\ 
+  Civ. liberties and pol. rights & 0.01 & 0.00054 & 0.01473 \\ 
+  Life expectancy & 0.00 & -0.00069 & 0.01508 \\ 
+  Technological progress & 0.00 & -0.00099 & 0.02030 \\ 
+  GDP level in 1990 & 0.00 & -0.00102 & 0.02294 \\ 
+  Rule of law & 0.00 & -0.00013 & 0.00744 \\
+  \midrule
+  \bottomrule
+\end{tabular}
+\end{table}
+
+\clearpage
+
+\begin{table}[!ht]
+\footnotesize
+\centering
+\caption{Dependent variable - average Gini index (wealth) 2010-2016, 73 observations, relative redistribution measure}
+\label{table:relred}
+\begin{tabular}{lrrr}
+  \toprule
+ & PIP & Post Mean & Post SD \\ 
+  \midrule
+  Value added in agriculture & 1.00 & -0.51152 & 0.15591 \\ 
+  Financial institutions efficiency & 0.99 & -0.28741 & 0.11147 \\ 
+  Access to financial institutions & 0.98 & -0.34837 & 0.15459 \\ 
+  Redistribution (rel.) & 0.95 & -0.27535 & 0.14043 \\ 
+  Outward orientation & 0.94 & 0.23308 & 0.11250 \\ 
+  Financial market depth & 0.81 & 0.34002 & 0.21938 \\ 
+  Education index (UN) & 0.72 & -0.22528 & 0.20282 \\ 
+  Number of war years & 0.59 & 0.08973 & 0.10332 \\ 
+  Economic freedom index (adjusted) & 0.36 & -0.08389 & 0.15606 \\ 
+  Labour market regulation & 0.32 & 0.03829 & 0.07734 \\ 
+  Natural resources rents & 0.28 & 0.04065 & 0.08833 \\ 
+  Financial institutions depth & 0.28 & 0.10702 & 0.21832 \\ 
+  Average GDP growth & 0.28 & -0.03598 & 0.07976 \\ 
+  Rule of law & 0.26 & 0.07442 & 0.17734 \\ 
+  Leftwing orientation & 0.22 & -0.02359 & 0.06261 \\ 
+  Net foreign direct investment & 0.20 & -0.02042 & 0.05956 \\ 
+  Net national savings & 0.20 & 0.02747 & 0.08091 \\ 
+  Government expenditures & 0.16 & 0.01994 & 0.06646 \\ 
+  Bank capital regulations & 0.11 & -0.00826 & 0.03810 \\ 
+  Population density & 0.10 & -0.00737 & 0.03893 \\ 
+  Civ. liberties and Pol. rights & 0.09 & -0.00684 & 0.05487 \\ 
+  Business conditions & 0.09 & -0.00679 & 0.03889 \\ 
+  GDP level in 1990 & 0.09 & -0.00754 & 0.08113 \\ 
+  Public education expenditures & 0.09 & 0.00452 & 0.03209 \\ 
+  Financial openness (Chinn-Ito) & 0.08 & 0.00371 & 0.04077 \\ 
+  Banking diversification & 0.08 & -0.00453 & 0.02891 \\ 
+  Financial liberalization (EFW) & 0.08 & -0.00225 & 0.04299 \\ 
+  Active banking restrictions & 0.08 & -0.00396 & 0.03201 \\ 
+  Latin America dummy & 0.07 & 0.00613 & 0.08853 \\ 
+  Technological progress & 0.07 & -0.00810 & 0.06770 \\ 
+  Financial markets efficiency & 0.06 & -0.00027 & 0.03059 \\ 
+  Inflation & 0.06 & 0.00238 & 0.02706 \\ 
+  Labour force participation & 0.06 & 0.00036 & 0.02077 \\ 
+  Life expectancy & 0.06 & 0.00055 & 0.04579 \\ 
+  Population growth & 0.06 & 0.00076 & 0.03609 \\ 
+  Value added in industry & 0.05 & -0.00063 & 0.02761 \\ 
+  Revolutions and coups & 0.05 & 0.00069 & 0.02121 \\ 
+   \bottomrule
+\end{tabular}
+\end{table}
+
+\clearpage
+
+\begin{table}[!ht]
+\footnotesize
+\centering
+\caption{Dependent variable - average Gini index (wealth) 2010-2016, specific financial indicators as proxies for financial development, 73 observations, dilution parameter prior}
+\label{table:res5}
+\begin{tabular}{lrrr}
+  \toprule
+ & PIP & Post Mean & Post SD \\ 
+  \midrule
+  Outward orientation & 1.00 & 0.30288 & 0.09493 \\ 
+  Value added in agriculture & 1.00 & -0.46969 & 0.16524 \\ 
+  Number of war years & 1.00 & 0.23140 & 0.09211 \\ 
+  Bank branches/1000 inh. & 0.99 & -0.23286 & 0.10392 \\ 
+  Redistribution & 0.96 & -0.27204 & 0.13368 \\ 
+  Private credit & 0.80 & 0.26709 & 0.20234 \\ 
+  Average GDP growth & 0.72 & -0.12719 & 0.11806 \\ 
+  Net interest margin & 0.71 & 0.26047 & 0.23046 \\ 
+  Business conditions & 0.63 & -0.16526 & 0.17583 \\ 
+  Inflation & 0.52 & 0.08140 & 0.10963 \\ 
+  Education index (UN) & 0.43 & -0.09997 & 0.16364 \\ 
+  Economic freedom index (adjusted) & 0.38 & -0.11007 & 0.18830 \\ 
+  Leftwing orientation & 0.26 & -0.02542 & 0.06428 \\ 
+  Labor market regulation & 0.17 & 0.01351 & 0.04931 \\ 
+  Rule of law & 0.17 & 0.02859 & 0.11191 \\ 
+  Net national savings & 0.16 & 0.01665 & 0.06290 \\ 
+  Natural resource rents & 0.16 & 0.01609 & 0.06250 \\ 
+  Bank Z-score & 0.15 & 0.01193 & 0.04857 \\ 
+  Latin America dummy & 0.13 & 0.01040 & 0.05422 \\ 
+  Banking diversification & 0.12 & -0.00670 & 0.03591 \\ 
+  Market capitalization & 0.11 & 0.00106 & 0.04334 \\ 
+  Market turnover & 0.11 & 0.00559 & 0.03372 \\ 
+  Civ. liberties and pol. rights & 0.11 & 0.00419 & 0.05246 \\ 
+  Value added in industry & 0.11 & 0.00610 & 0.04528 \\ 
+  Population growth & 0.11 & 0.00659 & 0.05385 \\ 
+  Life expectancy & 0.10 & -0.00578 & 0.06521 \\ 
+  Technological progress & 0.10 & 0.00530 & 0.08492 \\ 
+  Financial development index (EFW) & 0.10 & 0.00203 & 0.05079 \\ 
+  Net foreign direct investment & 0.10 & -0.00504 & 0.03344 \\ 
+  GDP level in 1990 & 0.10 & 0.00277 & 0.08595 \\ 
+  Financial openness (Chinn-Ito) & 0.09 & 0.00422 & 0.04314 \\ 
+  Public education expenditures & 0.09 & 0.00437 & 0.03492 \\ 
+  Government expenditures & 0.09 & 0.00648 & 0.04413 \\ 
+  Loan-to-deposits & 0.09 & 0.00400 & 0.03650 \\ 
+  Revolutions and coups & 0.09 & 0.00307 & 0.03130 \\ 
+  Active banking restrictions & 0.08 & 0.00076 & 0.03139 \\ 
+  Bank capital regulations & 0.08 & -0.00113 & 0.02484 \\ 
+  Population density & 0.07 & 0.00112 & 0.02579 \\ 
+  Labor force participation & 0.07 & -0.00105 & 0.02323 \\ 
+  \midrule
+  \bottomrule
+\end{tabular}
+\end{table}
+
+%
+%
+\clearpage
+\subsection*{List of countries}
+
+\begin{table}[ht!]
+\caption{List of countries}
+\label{tab:countries}
+\centering
+\begin{tabular}{lll}
+  \toprule
+  Argentina 	& India 		& Peru \\ 
+  Armenia 		& Ireland 		& Philippines \\ 
+  Australia 	& Israel 		& Poland \\ 
+  Austria 		& Italy 		& Portugal \\ 
+  Bangladesh 	& Jordan 		& Russia \\ 
+  Bolivia 		& Kenya 		& Singapore \\ 
+  Botswana 		& Korea, South	& Slovakia \\ 
+  Brazil 		& Kyrgyzstan 	& Slovenia \\ 
+  Bulgaria 		& Latvia 		& South Africa \\ 
+  Canada 		& Lithuania 	& Spain  \\ 
+  Colombia 		& Macedonia 	& Sri Lanka\\ 
+  Costa Rica 	& Malawi 		& Sweden   \\ 
+  Croatia 		& Malaysia 		& Switzerland \\ 
+  Czech Republic & Mauritius 	& Tanzania \\ 
+  Ecuador 		& Mexico 		& Thailand \\ 
+  Egypt 		& Moldova 		& Tunisia \\ 
+  Estonia 		& Morocco 		& Turkey \\ 
+  Finland 		& Nepal 		& Uganda \\ 
+  France		& Netherlands 	& Ukraine \\ 
+  Germany 		& New Zealand 	& United Kingdom \\ 
+  Ghana 		& Nigeria 		& United States \\ 
+  Greece 		& Norway 		& Uruguay \\ 
+  Hungary 		& Pakistan		& Venezuela \\ 
+  Chile 		& Panama 		& \\ 
+  Iceland 		& Paraguay 		&  \\ 
+  \bottomrule
+\end{tabular}
+\end{table}
+\clearpage
+
+\subsection*{Grouping of explanatory variables}
+\begin{table}[ht!]
+\footnotesize
+\caption{Explanatory Variables Sorted into Groups}
+\label{tab:groups}
+\centering
+\begin{tabular}{ll}
+  \toprule
+  \textsc{Group} & \textsc{Variables} \\
+  \midrule
+  \multirow{13}{*}{Economic}   & Value added in agriculture \\
+                & Value added in industry \\
+                & Outward orientation \\
+                & Redistribution \\
+                & Net national savings  \\
+                & Net foreign direct investment \\
+                & Average GDP growth \\
+                & GDP level in 1990 \\
+                & Inflation \\
+                & Government expenditures \\
+                & Public education expenditures \\
+                & Technological progress \\
+                & Labor force participation \\
+
+  \midrule
+  \multirow{5}{*}{Financial}   & Financial institutions efficiency \\
+                & Access to financial institutions  \\ 
+                & Financial market development \\
+                & Financial institutions development \\
+                & Financial markets efficiency \\
+    
+  \midrule
+  \multirow{4}{*}{Political}  & Number of war years  \\
+                & Leftwing orientation \\
+                & Revolutions and coups \\
+                & Civ. liberties and pol. rights \\
+
+  \midrule
+  \multirow{3}{*}{Institutional}  & Education index (UN) \\
+                & Economic freedom index (adjusted) \\
+                & Rule of law \\
+
+  \midrule
+  \multirow{7}{*}{Regulatory}  & Labor market regulation \\
+                & Banking diversification \\
+                & Active banking restrictions \\
+                & Bank capital regulations \\
+                & Financial openness (Chinn-Ito) \\
+                & Business conditions \\
+                & Financial liberalization index (EFW) \\
+ 
+  \midrule
+  \multirow{5}{*}{Geographical / natural} & Natural resource rents \\
+                                & Population density \\
+                                & Latin America dummy \\
+                                & Population growth \\
+                                & Life expectancy \\
+  \bottomrule
+\end{tabular}
+\end{table}
+\clearpage
+
+\subsection*{Descriptive statistics, correlation matrix, expected effects}
+\begin{table}[!ht]
+\caption{Descriptive statistics}
+\label{tab:desc_stat}
+\centering
+\begin{tabular}{lrrrr}
+  \toprule
+	 & Min. & Mean & Max. & Std.dev. \\ 
+  \midrule
+  Access to financial institutions & 0.02 & 0.36 & 0.96 & 0.26 \\ 
+  Active banking restrictions & 3.75 & 7.20 & 11.00 & 1.59 \\ 
+  Average GDP growth & -0.02 & 0.02 & 0.06 & 0.01 \\ 
+  Bank capital regulations & 2.00 & 6.64 & 10.00 & 1.61 \\ 
+  Banking diversification & 0.00 & 1.32 & 2.00 & 0.46 \\ 
+  Business conditions & -0.66 & -0.28 & 1.53 & 0.36 \\ 
+  Civ. liberties and Pol. rights & 1.00 & 2.88 & 5.41 & 1.42 \\ 
+  Economic freedom index (adjusted) & 0.48 & 0.70 & 0.89 & 0.10 \\ 
+  Education index (UN) & 0.27 & 0.63 & 0.89 & 0.15 \\ 
+  Financial institutions depth & 0.02 & 0.31 & 0.86 & 0.24 \\ 
+  Financial institutions efficiency & 0.28 & 0.58 & 0.76 & 0.12 \\ 
+  Financial liberalization (EFW) & 4.01 & 7.34 & 9.49 & 1.52 \\ 
+  Financial market depth & 0.00 & 0.22 & 0.73 & 0.20 \\ 
+  Financial markets efficiency & 0.01 & 0.35 & 0.95 & 0.26 \\ 
+  Financial openness (Chinn-Ito) & -1.47 & 0.41 & 2.39 & 1.26 \\ 
+  GDP level in 1990 & 6.69 & 9.00 & 10.57 & 1.02 \\ 
+  Government expenditures & 4.75 & 16.14 & 27.48 & 4.63 \\ 
+  Inflation & 1.93 & 46.70 & 466.21 & 101.75 \\ 
+  Labour force participation & 0.00 & 0.00 & 0.00 & 0.00 \\ 
+  Labour market regulation & 0.46 & 1.67 & 2.78 & 0.51 \\ 
+  Latin America dummy & 0.00 & 0.18 & 1.00 & 0.39 \\ 
+  Leftwing orientation & 0.00 & 8.81 & 30.00 & 8.37 \\ 
+  Life expectancy & 45.51 & 68.88 & 78.04 & 7.86 \\ 
+  Natural resources rents & 0.00 & 3.49 & 31.66 & 5.30 \\ 
+  Net foreign direct investment & 0.09 & 2.95 & 12.56 & 2.42 \\ 
+  Net national savings & -8.54 & 8.85 & 30.00 & 6.51 \\ 
+  Number of war years & 0.00 & 2.38 & 21.00 & 4.57 \\ 
+  Outward orientation & -0.33 & -0.03 & 0.19 & 0.08 \\ 
+  Population density & 2.22 & 164.99 & 4547.96 & 536.87 \\ 
+  Population growth & -0.57 & 1.24 & 3.62 & 1.04 \\ 
+  Public education expenditures & 1.24 & 4.27 & 11.18 & 1.54 \\ 
+  Redistribution & -3.40 & 9.41 & 22.37 & 7.07 \\ 
+  Revolutions and coups & 0.00 & 2.40 & 23.00 & 4.51 \\ 
+  Rule of law & -1.23 & 0.39 & 1.96 & 0.95 \\ 
+  Technological progress & -1.32 & 0.37 & 1.29 & 0.66 \\ 
+  Value added in agriculture & 0.41 & 12.26 & 45.27 & 11.79 \\ 
+  Value added in industry & 16.15 & 30.71 & 51.29 & 6.79 \\
+   \bottomrule
+\end{tabular}
+\end{table}
+\clearpage
+
+%
+%
+\eject \pdfpagewidth=18.53in \pdfpageheight=11.69in % A3 page
+\setlength\tabcolsep{2pt}
+
+\thispagestyle{empty}
+\begin{table}[!htbp]
+  \begin{minipage}[t]{16in}	
+  \small
+  \caption{Correlation matrix}
+    \begin{tabular}{lrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr}
+    \toprule
+          & \multicolumn{1}{c}{\begin{sideways}GiniWealth\end{sideways}} & \multicolumn{1}{c}{\cellcolor[rgb]{ .961,  .961,  .961} \begin{sideways}NatRes\end{sideways}} & \multicolumn{1}{c}{\begin{sideways}PopGrowth\end{sideways}} & \multicolumn{1}{c}{\cellcolor[rgb]{ .961,  .961,  .961} \begin{sideways}GovExp\end{sideways}} & \multicolumn{1}{c}{\begin{sideways}NNSavings\end{sideways}} & \multicolumn{1}{c}{\cellcolor[rgb]{ .961,  .961,  .961} \begin{sideways}EducExp\end{sideways}} & \multicolumn{1}{c}{\begin{sideways}Infl\end{sideways}} & \multicolumn{1}{c}{\cellcolor[rgb]{ .961,  .961,  .961} \begin{sideways}VAI\end{sideways}} & \multicolumn{1}{c}{\begin{sideways}VAA\end{sideways}} & \multicolumn{1}{c}{\cellcolor[rgb]{ .961,  .961,  .961} \begin{sideways}NetFDI\end{sideways}} & \multicolumn{1}{c}{\begin{sideways}RuleWB\end{sideways}} & \multicolumn{1}{c}{\cellcolor[rgb]{ .961,  .961,  .961} \begin{sideways}GDP90\end{sideways}} & \multicolumn{1}{c}{\begin{sideways}Ygrowth\end{sideways}} & \multicolumn{1}{c}{\cellcolor[rgb]{ .961,  .961,  .961} \begin{sideways}LifeExp90\end{sideways}} & \multicolumn{1}{c}{\begin{sideways}LFPart90\end{sideways}} & \multicolumn{1}{c}{\cellcolor[rgb]{ .961,  .961,  .961} \begin{sideways}PopDens90\end{sideways}} & \multicolumn{1}{c}{\begin{sideways}RevCoups\end{sideways}} & \multicolumn{1}{c}{\cellcolor[rgb]{ .961,  .961,  .961} \begin{sideways}WarYears\end{sideways}} & \multicolumn{1}{c}{\begin{sideways}EcoFreedom\end{sideways}} & \multicolumn{1}{c}{\cellcolor[rgb]{ .961,  .961,  .961} \begin{sideways}FinLib\end{sideways}} & \multicolumn{1}{c}{\begin{sideways}CLandPR\end{sideways}} & \multicolumn{1}{c}{\cellcolor[rgb]{ .961,  .961,  .961} \begin{sideways}OutwardO\end{sideways}} & \multicolumn{1}{c}{\begin{sideways}LatAm\end{sideways}} & \multicolumn{1}{c}{\cellcolor[rgb]{ .961,  .961,  .961} \begin{sideways}ChinnIto\end{sideways}} & \multicolumn{1}{c}{\begin{sideways}LeftWing\end{sideways}} & \multicolumn{1}{c}{\cellcolor[rgb]{ .961,  .961,  .961} \begin{sideways}ActivRestrict\end{sideways}} & \multicolumn{1}{c}{\begin{sideways}CapitalReg\end{sideways}} & \multicolumn{1}{c}{\cellcolor[rgb]{ .961,  .961,  .961} \begin{sideways}DiversIndex\end{sideways}} & \multicolumn{1}{c}{\begin{sideways}LAMRIG\end{sideways}} & \multicolumn{1}{c}{\cellcolor[rgb]{ .961,  .961,  .961} \begin{sideways}Tech\end{sideways}} & \multicolumn{1}{c}{\begin{sideways}EducIndex\end{sideways}} & \multicolumn{1}{c}{\cellcolor[rgb]{ .961,  .961,  .961} \begin{sideways}FID\end{sideways}} & \multicolumn{1}{c}{\begin{sideways}FIA\end{sideways}} & \multicolumn{1}{c}{\cellcolor[rgb]{ .961,  .961,  .961} \begin{sideways}FIE\end{sideways}} & \multicolumn{1}{c}{\begin{sideways}FMD\end{sideways}} & \multicolumn{1}{c}{\cellcolor[rgb]{ .961,  .961,  .961} \begin{sideways}FME\end{sideways}} & \multicolumn{1}{c}{\begin{sideways}BussCond\end{sideways}} \\
+
+    NatRes & 0.35  & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    PopGrowth & 0.24  & \cellcolor[rgb]{ .961,  .961,  .961} 0.44 &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    GovExp & -0.19 & \cellcolor[rgb]{ .961,  .961,  .961} -0.32 & -0.43 & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    NNSavings & 0.34  & \cellcolor[rgb]{ .961,  .961,  .961} 0.14 & 0.42  & \cellcolor[rgb]{ .961,  .961,  .961} -0.36 &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    EducExp & -0.03 & \cellcolor[rgb]{ .961,  .961,  .961} -0.10 & -0.19 & \cellcolor[rgb]{ .961,  .961,  .961} 0.58 & -0.20 & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    Infl  & 0.22  & \cellcolor[rgb]{ .961,  .961,  .961} 0.06 & -0.06 & \cellcolor[rgb]{ .961,  .961,  .961} -0.12 & -0.14 & \cellcolor[rgb]{ .961,  .961,  .961} -0.11 &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    VAI   & 0.35  & \cellcolor[rgb]{ .961,  .961,  .961} 0.24 & -0.18 & \cellcolor[rgb]{ .961,  .961,  .961} 0.00 & 0.32  & \cellcolor[rgb]{ .961,  .961,  .961} 0.03 & 0.20  & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    VAA   & -0.08 & \cellcolor[rgb]{ .961,  .961,  .961} 0.41 & 0.52  & \cellcolor[rgb]{ .961,  .961,  .961} -0.49 & -0.02 & \cellcolor[rgb]{ .961,  .961,  .961} -0.29 & 0.04  & \cellcolor[rgb]{ .961,  .961,  .961} -0.37 &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    NetFDI & -0.21 & \cellcolor[rgb]{ .961,  .961,  .961} -0.12 & -0.29 & \cellcolor[rgb]{ .961,  .961,  .961} 0.29 & -0.02 & \cellcolor[rgb]{ .961,  .961,  .961} 0.14 & -0.02 & \cellcolor[rgb]{ .961,  .961,  .961} 0.13 & -0.25 & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    RuleWB & -0.13 & \cellcolor[rgb]{ .961,  .961,  .961} -0.42 & -0.41 & \cellcolor[rgb]{ .961,  .961,  .961} 0.48 & -0.02 & \cellcolor[rgb]{ .961,  .961,  .961} 0.26 & -0.36 & \cellcolor[rgb]{ .961,  .961,  .961} -0.04 & -0.64 & \cellcolor[rgb]{ .961,  .961,  .961} 0.25 &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    GDP90 & -0.04 & \cellcolor[rgb]{ .961,  .961,  .961} -0.45 & -0.66 & \cellcolor[rgb]{ .961,  .961,  .961} 0.56 & -0.18 & \cellcolor[rgb]{ .961,  .961,  .961} 0.36 & -0.16 & \cellcolor[rgb]{ .961,  .961,  .961} 0.20 & -0.85 & \cellcolor[rgb]{ .961,  .961,  .961} 0.26 & 0.75  & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    Ygrowth & -0.09 & \cellcolor[rgb]{ .961,  .961,  .961} -0.09 & 0.02  & \cellcolor[rgb]{ .961,  .961,  .961} -0.18 & 0.43  & \cellcolor[rgb]{ .961,  .961,  .961} -0.27 & -0.26 & \cellcolor[rgb]{ .961,  .961,  .961} 0.20 & -0.08 & \cellcolor[rgb]{ .961,  .961,  .961} 0.08 & 0.30  & \cellcolor[rgb]{ .961,  .961,  .961} -0.01 &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    LifeExp90 & -0.07 & \cellcolor[rgb]{ .961,  .961,  .961} -0.54 & -0.59 & \cellcolor[rgb]{ .961,  .961,  .961} 0.44 & -0.07 & \cellcolor[rgb]{ .961,  .961,  .961} 0.33 & -0.16 & \cellcolor[rgb]{ .961,  .961,  .961} 0.19 & -0.83 & \cellcolor[rgb]{ .961,  .961,  .961} 0.24 & 0.67  & \cellcolor[rgb]{ .961,  .961,  .961} 0.90 & 0.04  & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    LFPart90 & -0.17 & \cellcolor[rgb]{ .961,  .961,  .961} -0.15 & -0.06 & \cellcolor[rgb]{ .961,  .961,  .961} 0.18 & -0.11 & \cellcolor[rgb]{ .961,  .961,  .961} 0.14 & -0.07 & \cellcolor[rgb]{ .961,  .961,  .961} -0.05 & -0.09 & \cellcolor[rgb]{ .961,  .961,  .961} 0.11 & 0.23  & \cellcolor[rgb]{ .961,  .961,  .961} 0.19 & 0.07  & \cellcolor[rgb]{ .961,  .961,  .961} 0.17 &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    PopDens90 & 0.00  & \cellcolor[rgb]{ .961,  .961,  .961} -0.13 & 0.12  & \cellcolor[rgb]{ .961,  .961,  .961} -0.21 & 0.44  & \cellcolor[rgb]{ .961,  .961,  .961} -0.19 & -0.09 & \cellcolor[rgb]{ .961,  .961,  .961} 0.00 & -0.09 & \cellcolor[rgb]{ .961,  .961,  .961} 0.44 & 0.14  & \cellcolor[rgb]{ .961,  .961,  .961} 0.08 & 0.27  & \cellcolor[rgb]{ .961,  .961,  .961} 0.08 & 0.00  & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    RevCoups & 0.25  & \cellcolor[rgb]{ .961,  .961,  .961} 0.32 & 0.33  & \cellcolor[rgb]{ .961,  .961,  .961} -0.45 & 0.16  & \cellcolor[rgb]{ .961,  .961,  .961} -0.15 & 0.51  & \cellcolor[rgb]{ .961,  .961,  .961} 0.12 & 0.19  & \cellcolor[rgb]{ .961,  .961,  .961} -0.20 & -0.46 & \cellcolor[rgb]{ .961,  .961,  .961} -0.39 & -0.14 & \cellcolor[rgb]{ .961,  .961,  .961} -0.32 & -0.13 & \cellcolor[rgb]{ .961,  .961,  .961} -0.09 &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    WarYears & 0.32  & \cellcolor[rgb]{ .961,  .961,  .961} 0.17 & 0.30  & \cellcolor[rgb]{ .961,  .961,  .961} -0.28 & 0.25  & \cellcolor[rgb]{ .961,  .961,  .961} -0.32 & -0.03 & \cellcolor[rgb]{ .961,  .961,  .961} -0.06 & 0.28  & \cellcolor[rgb]{ .961,  .961,  .961} -0.31 & -0.26 & \cellcolor[rgb]{ .961,  .961,  .961} -0.34 & 0.14  & \cellcolor[rgb]{ .961,  .961,  .961} -0.31 & -0.16 & \cellcolor[rgb]{ .961,  .961,  .961} -0.02 & 0.02  & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    EcoFreedom & -0.20 & \cellcolor[rgb]{ .961,  .961,  .961} -0.46 & -0.40 & \cellcolor[rgb]{ .961,  .961,  .961} 0.47 & -0.13 & \cellcolor[rgb]{ .961,  .961,  .961} 0.24 & -0.27 & \cellcolor[rgb]{ .961,  .961,  .961} -0.05 & -0.69 & \cellcolor[rgb]{ .961,  .961,  .961} 0.39 & 0.85  & \cellcolor[rgb]{ .961,  .961,  .961} 0.76 & 0.23  & \cellcolor[rgb]{ .961,  .961,  .961} 0.70 & 0.20  & \cellcolor[rgb]{ .961,  .961,  .961} 0.21 & -0.40 & \cellcolor[rgb]{ .961,  .961,  .961} -0.34 &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    FinLib & -0.15 & \cellcolor[rgb]{ .961,  .961,  .961} -0.35 & -0.36 & \cellcolor[rgb]{ .961,  .961,  .961} 0.39 & -0.18 & \cellcolor[rgb]{ .961,  .961,  .961} 0.31 & -0.15 & \cellcolor[rgb]{ .961,  .961,  .961} 0.02 & -0.59 & \cellcolor[rgb]{ .961,  .961,  .961} 0.34 & 0.65  & \cellcolor[rgb]{ .961,  .961,  .961} 0.68 & 0.04  & \cellcolor[rgb]{ .961,  .961,  .961} 0.64 & 0.13  & \cellcolor[rgb]{ .961,  .961,  .961} 0.10 & -0.21 & \cellcolor[rgb]{ .961,  .961,  .961} -0.38 & 0.81  & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    CLandPR & 0.10  & \cellcolor[rgb]{ .961,  .961,  .961} 0.43 & 0.55  & \cellcolor[rgb]{ .961,  .961,  .961} -0.44 & 0.17  & \cellcolor[rgb]{ .961,  .961,  .961} -0.33 & 0.14  & \cellcolor[rgb]{ .961,  .961,  .961} -0.05 & 0.67  & \cellcolor[rgb]{ .961,  .961,  .961} -0.06 & -0.76 & \cellcolor[rgb]{ .961,  .961,  .961} -0.76 & -0.04 & \cellcolor[rgb]{ .961,  .961,  .961} -0.68 & -0.22 & \cellcolor[rgb]{ .961,  .961,  .961} 0.14 & 0.23  & \cellcolor[rgb]{ .961,  .961,  .961} 0.27 & -0.67 & \cellcolor[rgb]{ .961,  .961,  .961} -0.63 &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    OutwardO & 0.41  & \cellcolor[rgb]{ .961,  .961,  .961} 0.50 & -0.02 & \cellcolor[rgb]{ .961,  .961,  .961} -0.14 & 0.16  & \cellcolor[rgb]{ .961,  .961,  .961} 0.06 & 0.07  & \cellcolor[rgb]{ .961,  .961,  .961} 0.42 & 0.03  & \cellcolor[rgb]{ .961,  .961,  .961} -0.16 & -0.01 & \cellcolor[rgb]{ .961,  .961,  .961} 0.04 & 0.01  & \cellcolor[rgb]{ .961,  .961,  .961} -0.10 & -0.16 & \cellcolor[rgb]{ .961,  .961,  .961} -0.22 & 0.19  & \cellcolor[rgb]{ .961,  .961,  .961} 0.08 & -0.16 & \cellcolor[rgb]{ .961,  .961,  .961} -0.14 & -0.15 & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    LatAm & 0.28  & \cellcolor[rgb]{ .961,  .961,  .961} 0.14 & 0.23  & \cellcolor[rgb]{ .961,  .961,  .961} -0.38 & 0.05  & \cellcolor[rgb]{ .961,  .961,  .961} -0.04 & 0.41  & \cellcolor[rgb]{ .961,  .961,  .961} 0.20 & -0.07 & \cellcolor[rgb]{ .961,  .961,  .961} -0.11 & -0.34 & \cellcolor[rgb]{ .961,  .961,  .961} -0.15 & -0.22 & \cellcolor[rgb]{ .961,  .961,  .961} 0.01 & -0.06 & \cellcolor[rgb]{ .961,  .961,  .961} -0.12 & 0.53  & \cellcolor[rgb]{ .961,  .961,  .961} -0.10 & -0.16 & \cellcolor[rgb]{ .961,  .961,  .961} 0.05 & 0.05  & \cellcolor[rgb]{ .961,  .961,  .961} 0.11 &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    ChinnIto & -0.13 & \cellcolor[rgb]{ .961,  .961,  .961} -0.29 & -0.42 & \cellcolor[rgb]{ .961,  .961,  .961} 0.35 & -0.11 & \cellcolor[rgb]{ .961,  .961,  .961} 0.26 & -0.13 & \cellcolor[rgb]{ .961,  .961,  .961} -0.03 & -0.54 & \cellcolor[rgb]{ .961,  .961,  .961} 0.36 & 0.63  & \cellcolor[rgb]{ .961,  .961,  .961} 0.65 & 0.10  & \cellcolor[rgb]{ .961,  .961,  .961} 0.59 & 0.04  & \cellcolor[rgb]{ .961,  .961,  .961} 0.14 & -0.24 & \cellcolor[rgb]{ .961,  .961,  .961} -0.32 & 0.74  & \cellcolor[rgb]{ .961,  .961,  .961} 0.84 & -0.59 & \cellcolor[rgb]{ .961,  .961,  .961} -0.09 & -0.09 & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    LeftWing & -0.13 & \cellcolor[rgb]{ .961,  .961,  .961} -0.12 & -0.18 & \cellcolor[rgb]{ .961,  .961,  .961} 0.18 & -0.17 & \cellcolor[rgb]{ .961,  .961,  .961} 0.23 & -0.06 & \cellcolor[rgb]{ .961,  .961,  .961} -0.10 & -0.15 & \cellcolor[rgb]{ .961,  .961,  .961} -0.05 & 0.26  & \cellcolor[rgb]{ .961,  .961,  .961} 0.13 & -0.08 & \cellcolor[rgb]{ .961,  .961,  .961} 0.15 & -0.15 & \cellcolor[rgb]{ .961,  .961,  .961} -0.13 & -0.17 & \cellcolor[rgb]{ .961,  .961,  .961} -0.06 & 0.08  & \cellcolor[rgb]{ .961,  .961,  .961} -0.02 & -0.24 & \cellcolor[rgb]{ .961,  .961,  .961} 0.06 & 0.03  & \cellcolor[rgb]{ .961,  .961,  .961} -0.05 &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    ActivRestrict & 0.00  & \cellcolor[rgb]{ .961,  .961,  .961} 0.22 & 0.49  & \cellcolor[rgb]{ .961,  .961,  .961} -0.31 & 0.11  & \cellcolor[rgb]{ .961,  .961,  .961} -0.09 & -0.02 & \cellcolor[rgb]{ .961,  .961,  .961} -0.10 & 0.42  & \cellcolor[rgb]{ .961,  .961,  .961} -0.23 & -0.43 & \cellcolor[rgb]{ .961,  .961,  .961} -0.53 & 0.22  & \cellcolor[rgb]{ .961,  .961,  .961} -0.45 & 0.00  & \cellcolor[rgb]{ .961,  .961,  .961} -0.02 & 0.27  & \cellcolor[rgb]{ .961,  .961,  .961} 0.15 & -0.40 & \cellcolor[rgb]{ .961,  .961,  .961} -0.37 & 0.41  & \cellcolor[rgb]{ .961,  .961,  .961} -0.11 & 0.24  & \cellcolor[rgb]{ .961,  .961,  .961} -0.50 & -0.09 & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    CapitalReg & 0.02  & \cellcolor[rgb]{ .961,  .961,  .961} -0.01 & 0.23  & \cellcolor[rgb]{ .961,  .961,  .961} -0.08 & 0.14  & \cellcolor[rgb]{ .961,  .961,  .961} -0.01 & 0.00  & \cellcolor[rgb]{ .961,  .961,  .961} -0.15 & 0.23  & \cellcolor[rgb]{ .961,  .961,  .961} -0.02 & -0.19 & \cellcolor[rgb]{ .961,  .961,  .961} -0.28 & 0.05  & \cellcolor[rgb]{ .961,  .961,  .961} -0.30 & -0.04 & \cellcolor[rgb]{ .961,  .961,  .961} 0.08 & 0.16  & \cellcolor[rgb]{ .961,  .961,  .961} 0.22 & -0.26 & \cellcolor[rgb]{ .961,  .961,  .961} -0.19 & 0.29  & \cellcolor[rgb]{ .961,  .961,  .961} -0.09 & -0.12 & \cellcolor[rgb]{ .961,  .961,  .961} -0.25 & -0.15 & \cellcolor[rgb]{ .961,  .961,  .961} 0.27 &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    DiversIndex & -0.04 & \cellcolor[rgb]{ .961,  .961,  .961} -0.19 & -0.20 & \cellcolor[rgb]{ .961,  .961,  .961} 0.23 & -0.05 & \cellcolor[rgb]{ .961,  .961,  .961} 0.25 & -0.10 & \cellcolor[rgb]{ .961,  .961,  .961} 0.12 & -0.36 & \cellcolor[rgb]{ .961,  .961,  .961} 0.20 & 0.27  & \cellcolor[rgb]{ .961,  .961,  .961} 0.35 & -0.06 & \cellcolor[rgb]{ .961,  .961,  .961} 0.32 & -0.05 & \cellcolor[rgb]{ .961,  .961,  .961} 0.05 & -0.24 & \cellcolor[rgb]{ .961,  .961,  .961} -0.06 & 0.29  & \cellcolor[rgb]{ .961,  .961,  .961} 0.40 & -0.25 & \cellcolor[rgb]{ .961,  .961,  .961} -0.05 & -0.02 & \cellcolor[rgb]{ .961,  .961,  .961} 0.41 & 0.01  & \cellcolor[rgb]{ .961,  .961,  .961} -0.30 & -0.04 & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    LAMRIG & -0.08 & \cellcolor[rgb]{ .961,  .961,  .961} -0.10 & -0.27 & \cellcolor[rgb]{ .961,  .961,  .961} 0.15 & -0.15 & \cellcolor[rgb]{ .961,  .961,  .961} 0.05 & 0.20  & \cellcolor[rgb]{ .961,  .961,  .961} 0.06 & -0.05 & \cellcolor[rgb]{ .961,  .961,  .961} 0.03 & -0.20 & \cellcolor[rgb]{ .961,  .961,  .961} 0.00 & -0.21 & \cellcolor[rgb]{ .961,  .961,  .961} 0.06 & 0.06  & \cellcolor[rgb]{ .961,  .961,  .961} -0.18 & 0.12  & \cellcolor[rgb]{ .961,  .961,  .961} -0.13 & -0.17 & \cellcolor[rgb]{ .961,  .961,  .961} -0.10 & -0.01 & \cellcolor[rgb]{ .961,  .961,  .961} -0.05 & 0.21  & \cellcolor[rgb]{ .961,  .961,  .961} -0.07 & 0.09  & \cellcolor[rgb]{ .961,  .961,  .961} -0.03 & 0.05  & \cellcolor[rgb]{ .961,  .961,  .961} -0.12 &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    Tech  & -0.07 & \cellcolor[rgb]{ .961,  .961,  .961} -0.44 & -0.67 & \cellcolor[rgb]{ .961,  .961,  .961} 0.60 & -0.25 & \cellcolor[rgb]{ .961,  .961,  .961} 0.40 & -0.10 & \cellcolor[rgb]{ .961,  .961,  .961} 0.17 & -0.82 & \cellcolor[rgb]{ .961,  .961,  .961} 0.33 & 0.72  & \cellcolor[rgb]{ .961,  .961,  .961} 0.93 & -0.08 & \cellcolor[rgb]{ .961,  .961,  .961} 0.88 & 0.16  & \cellcolor[rgb]{ .961,  .961,  .961} 0.04 & -0.37 & \cellcolor[rgb]{ .961,  .961,  .961} -0.40 & 0.73  & \cellcolor[rgb]{ .961,  .961,  .961} 0.67 & -0.68 & \cellcolor[rgb]{ .961,  .961,  .961} -0.02 & -0.12 & \cellcolor[rgb]{ .961,  .961,  .961} 0.61 & 0.17  & \cellcolor[rgb]{ .961,  .961,  .961} -0.49 & -0.25 & \cellcolor[rgb]{ .961,  .961,  .961} 0.40 & 0.02  & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    EducIndex & -0.11 & \cellcolor[rgb]{ .961,  .961,  .961} -0.37 & -0.69 & \cellcolor[rgb]{ .961,  .961,  .961} 0.58 & -0.28 & \cellcolor[rgb]{ .961,  .961,  .961} 0.40 & -0.02 & \cellcolor[rgb]{ .961,  .961,  .961} 0.19 & -0.75 & \cellcolor[rgb]{ .961,  .961,  .961} 0.34 & 0.70  & \cellcolor[rgb]{ .961,  .961,  .961} 0.87 & -0.03 & \cellcolor[rgb]{ .961,  .961,  .961} 0.80 & 0.15  & \cellcolor[rgb]{ .961,  .961,  .961} -0.01 & -0.31 & \cellcolor[rgb]{ .961,  .961,  .961} -0.29 & 0.72  & \cellcolor[rgb]{ .961,  .961,  .961} 0.72 & -0.73 & \cellcolor[rgb]{ .961,  .961,  .961} 0.05 & -0.14 & \cellcolor[rgb]{ .961,  .961,  .961} 0.68 & 0.12  & \cellcolor[rgb]{ .961,  .961,  .961} -0.54 & -0.32 & \cellcolor[rgb]{ .961,  .961,  .961} 0.33 & -0.01 & \cellcolor[rgb]{ .961,  .961,  .961} 0.88 &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    FID   & 0.08  & \cellcolor[rgb]{ .961,  .961,  .961} -0.26 & -0.24 & \cellcolor[rgb]{ .961,  .961,  .961} 0.37 & 0.06  & \cellcolor[rgb]{ .961,  .961,  .961} 0.23 & -0.24 & \cellcolor[rgb]{ .961,  .961,  .961} 0.01 & -0.64 & \cellcolor[rgb]{ .961,  .961,  .961} 0.21 & 0.81  & \cellcolor[rgb]{ .961,  .961,  .961} 0.71 & 0.15  & \cellcolor[rgb]{ .961,  .961,  .961} 0.63 & 0.08  & \cellcolor[rgb]{ .961,  .961,  .961} 0.18 & -0.32 & \cellcolor[rgb]{ .961,  .961,  .961} -0.20 & 0.74  & \cellcolor[rgb]{ .961,  .961,  .961} 0.56 & -0.61 & \cellcolor[rgb]{ .961,  .961,  .961} 0.12 & -0.22 & \cellcolor[rgb]{ .961,  .961,  .961} 0.56 & 0.13  & \cellcolor[rgb]{ .961,  .961,  .961} -0.46 & -0.25 & \cellcolor[rgb]{ .961,  .961,  .961} 0.30 & -0.29 & \cellcolor[rgb]{ .961,  .961,  .961} 0.67 & 0.61  & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    FIA   & -0.20 & \cellcolor[rgb]{ .961,  .961,  .961} -0.41 & -0.52 & \cellcolor[rgb]{ .961,  .961,  .961} 0.44 & -0.19 & \cellcolor[rgb]{ .961,  .961,  .961} 0.18 & -0.16 & \cellcolor[rgb]{ .961,  .961,  .961} -0.03 & -0.71 & \cellcolor[rgb]{ .961,  .961,  .961} 0.16 & 0.71  & \cellcolor[rgb]{ .961,  .961,  .961} 0.79 & 0.09  & \cellcolor[rgb]{ .961,  .961,  .961} 0.72 & 0.23  & \cellcolor[rgb]{ .961,  .961,  .961} -0.01 & -0.30 & \cellcolor[rgb]{ .961,  .961,  .961} -0.30 & 0.66  & \cellcolor[rgb]{ .961,  .961,  .961} 0.55 & -0.73 & \cellcolor[rgb]{ .961,  .961,  .961} -0.07 & -0.18 & \cellcolor[rgb]{ .961,  .961,  .961} 0.54 & 0.13  & \cellcolor[rgb]{ .961,  .961,  .961} -0.48 & -0.20 & \cellcolor[rgb]{ .961,  .961,  .961} 0.24 & 0.06  & \cellcolor[rgb]{ .961,  .961,  .961} 0.74 & 0.69  & \cellcolor[rgb]{ .961,  .961,  .961} 0.73 &       & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    FIE   & -0.18 & \cellcolor[rgb]{ .961,  .961,  .961} -0.19 & 0.03  & \cellcolor[rgb]{ .961,  .961,  .961} 0.16 & 0.41  & \cellcolor[rgb]{ .961,  .961,  .961} 0.06 & -0.48 & \cellcolor[rgb]{ .961,  .961,  .961} -0.05 & -0.29 & \cellcolor[rgb]{ .961,  .961,  .961} 0.10 & 0.52  & \cellcolor[rgb]{ .961,  .961,  .961} 0.20 & 0.37  & \cellcolor[rgb]{ .961,  .961,  .961} 0.27 & 0.05  & \cellcolor[rgb]{ .961,  .961,  .961} 0.19 & -0.22 & \cellcolor[rgb]{ .961,  .961,  .961} -0.13 & 0.38  & \cellcolor[rgb]{ .961,  .961,  .961} 0.17 & -0.26 & \cellcolor[rgb]{ .961,  .961,  .961} -0.02 & -0.29 & \cellcolor[rgb]{ .961,  .961,  .961} 0.23 & 0.17  & \cellcolor[rgb]{ .961,  .961,  .961} -0.19 & -0.11 & \cellcolor[rgb]{ .961,  .961,  .961} 0.13 & -0.09 & \cellcolor[rgb]{ .961,  .961,  .961} 0.16 & 0.09  & \cellcolor[rgb]{ .961,  .961,  .961} 0.48 & 0.29  & \cellcolor[rgb]{ .961,  .961,  .961}  &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    FMD   & 0.19  & \cellcolor[rgb]{ .961,  .961,  .961} -0.19 & -0.16 & \cellcolor[rgb]{ .961,  .961,  .961} 0.23 & 0.19  & \cellcolor[rgb]{ .961,  .961,  .961} 0.13 & -0.27 & \cellcolor[rgb]{ .961,  .961,  .961} 0.03 & -0.55 & \cellcolor[rgb]{ .961,  .961,  .961} 0.16 & 0.73  & \cellcolor[rgb]{ .961,  .961,  .961} 0.64 & 0.15  & \cellcolor[rgb]{ .961,  .961,  .961} 0.56 & 0.03  & \cellcolor[rgb]{ .961,  .961,  .961} 0.25 & -0.26 & \cellcolor[rgb]{ .961,  .961,  .961} -0.03 & 0.63  & \cellcolor[rgb]{ .961,  .961,  .961} 0.48 & -0.50 & \cellcolor[rgb]{ .961,  .961,  .961} 0.16 & -0.28 & \cellcolor[rgb]{ .961,  .961,  .961} 0.53 & 0.05  & \cellcolor[rgb]{ .961,  .961,  .961} -0.49 & -0.14 & \cellcolor[rgb]{ .961,  .961,  .961} 0.28 & -0.30 & \cellcolor[rgb]{ .961,  .961,  .961} 0.59 & 0.53  & \cellcolor[rgb]{ .961,  .961,  .961} 0.91 & 0.62  & \cellcolor[rgb]{ .961,  .961,  .961} 0.45 &       & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    FME   & 0.02  & \cellcolor[rgb]{ .961,  .961,  .961} -0.35 & -0.36 & \cellcolor[rgb]{ .961,  .961,  .961} 0.27 & -0.01 & \cellcolor[rgb]{ .961,  .961,  .961} 0.13 & -0.23 & \cellcolor[rgb]{ .961,  .961,  .961} -0.02 & -0.39 & \cellcolor[rgb]{ .961,  .961,  .961} 0.10 & 0.46  & \cellcolor[rgb]{ .961,  .961,  .961} 0.52 & 0.07  & \cellcolor[rgb]{ .961,  .961,  .961} 0.45 & -0.10 & \cellcolor[rgb]{ .961,  .961,  .961} 0.12 & -0.24 & \cellcolor[rgb]{ .961,  .961,  .961} -0.01 & 0.39  & \cellcolor[rgb]{ .961,  .961,  .961} 0.30 & -0.38 & \cellcolor[rgb]{ .961,  .961,  .961} 0.14 & -0.35 & \cellcolor[rgb]{ .961,  .961,  .961} 0.30 & 0.14  & \cellcolor[rgb]{ .961,  .961,  .961} -0.38 & 0.07  & \cellcolor[rgb]{ .961,  .961,  .961} 0.26 & 0.04  & \cellcolor[rgb]{ .961,  .961,  .961} 0.50 & 0.44  & \cellcolor[rgb]{ .961,  .961,  .961} 0.51 & 0.47  & \cellcolor[rgb]{ .961,  .961,  .961} 0.12 & 0.58  & \cellcolor[rgb]{ .961,  .961,  .961}  &  \\
+    BussCond & 0.16  & \cellcolor[rgb]{ .961,  .961,  .961} 0.39 & 0.47  & \cellcolor[rgb]{ .961,  .961,  .961} -0.31 & 0.16  & \cellcolor[rgb]{ .961,  .961,  .961} -0.11 & 0.26  & \cellcolor[rgb]{ .961,  .961,  .961} 0.18 & 0.33  & \cellcolor[rgb]{ .961,  .961,  .961} -0.25 & -0.51 & \cellcolor[rgb]{ .961,  .961,  .961} -0.52 & -0.22 & \cellcolor[rgb]{ .961,  .961,  .961} -0.50 & -0.13 & \cellcolor[rgb]{ .961,  .961,  .961} -0.16 & 0.48  & \cellcolor[rgb]{ .961,  .961,  .961} 0.07 & -0.56 & \cellcolor[rgb]{ .961,  .961,  .961} -0.36 & 0.30  & \cellcolor[rgb]{ .961,  .961,  .961} 0.18 & 0.45  & \cellcolor[rgb]{ .961,  .961,  .961} -0.38 & 0.03  & \cellcolor[rgb]{ .961,  .961,  .961} 0.29 & 0.14  & \cellcolor[rgb]{ .961,  .961,  .961} -0.17 & 0.22  & \cellcolor[rgb]{ .961,  .961,  .961} -0.50 & -0.47 & \cellcolor[rgb]{ .961,  .961,  .961} -0.42 & -0.37 & \cellcolor[rgb]{ .961,  .961,  .961} -0.19 & -0.41 & \cellcolor[rgb]{ .961,  .961,  .961} -0.42 &  \\
+    Redist & -0.33 & \cellcolor[rgb]{ .961,  .961,  .961} -0.35 & -0.64 & \cellcolor[rgb]{ .961,  .961,  .961} 0.67 & -0.42 & \cellcolor[rgb]{ .961,  .961,  .961} 0.35 & -0.28 & \cellcolor[rgb]{ .961,  .961,  .961} -0.11 & -0.49 & \cellcolor[rgb]{ .961,  .961,  .961} 0.31 & 0.63  & \cellcolor[rgb]{ .961,  .961,  .961} 0.63 & -0.06 & \cellcolor[rgb]{ .961,  .961,  .961} 0.51 & 0.11  & \cellcolor[rgb]{ .961,  .961,  .961} -0.08 & -0.46 & \cellcolor[rgb]{ .961,  .961,  .961} -0.30 & 0.61  & \cellcolor[rgb]{ .961,  .961,  .961} 0.51 & -0.61 & \cellcolor[rgb]{ .961,  .961,  .961} -0.02 & -0.42 & \cellcolor[rgb]{ .961,  .961,  .961} 0.51 & 0.22  & \cellcolor[rgb]{ .961,  .961,  .961} -0.40 & -0.23 & \cellcolor[rgb]{ .961,  .961,  .961} 0.27 & 0.12  & \cellcolor[rgb]{ .961,  .961,  .961} 0.63 & 0.64  & \cellcolor[rgb]{ .961,  .961,  .961} 0.50 & 0.59  & \cellcolor[rgb]{ .961,  .961,  .961} 0.24 & 0.38  & \cellcolor[rgb]{ .961,  .961,  .961} 0.49 & -0.47 \\
+    \bottomrule
+    \end{tabular}%
+  \label{tab:corr}%n
+\end{minipage}
+\end{table}%
+
+
+\clearpage
+
+% set pages back to A4
+\eject \pdfpagewidth=8.27in \pdfpageheight=11.69in % standard A4
+
+\restoregeometry
+%
+%
+
+\begin{landscape}
+\centering
+\setlength\tabcolsep{6pt}
+\newgeometry{left=0cm, top=3.5cm, bottom=4cm, right=0cm}
+\begin{table}	
+\footnotesize
+\caption{Expected effects of the explanatory variables}
+\label{tab:exp_eff}
+\begin{tabular}{lc|lc|lc}
+  \toprule
+  Access to financial institutions & + / - & Financial markets efficiency 	& - 	& Number of war years & +			\\ 
+  Active banking restrictions 	   & + / - & Financial openness (Chinn-Ito) & + / - & Outward orientation & + 			\\ 
+  Average GDP growth 			   & + / - & GDP level in 1990 				& + / - & Population density & - 			\\ 
+  Bank capital regulations 		   & + / - & Government expenditures 		& + / - & Population growth & -  			\\ 
+  Banking diversification 		   & + / - & Inflation 						& + / - & Public education expenditures & - \\ 
+  Business conditions 			   & - 	   & Labour force participation 	& - 	& Redistribution & - 				\\ 
+  Civ. liberties and Pol. rights   & + 	   & Labour market regulations 		& + / - & Revolutions and coups & + / - 	\\ 
+  Economic freedom index (adjusted) & -    & Latin America dummy			& + / - & Rule of law & + / - 				\\ 
+  Education index (UN) 			   & - 	   & Leftwing orientation			& - 	& Technological progress & + / - 	\\ 
+  Financial institutions depth 	   & + / - & Life expectancy 				& - 	& Value added in agriculture & - 	\\ 
+  Financial institutions efficiency & -    & Natural resources rents 		& + / - & Value added in industry & - 		\\ 
+  Financial liberalization (EFW)   & + / - & Net foreign direct investment  & + / - & 									\\ 
+  Financial market depth 		   & + / - & Net national savings 			& + 	& 									\\ 
+   \bottomrule
+\end{tabular}
+\end{table}
+\end{landscape}
+\clearpage
+
+%
+%
+\restoregeometry
+\subsection*{Top models by their posterior model probability, group PIPs}
+\begin{table}[!htbp]
+\centering
+\caption{Top 3 models according to their posterior mode probabilities}
+\label{table:top3}
+%
+\begin{threeparttable}
+%
+\begin{tabularx}{0.7\linewidth}{lccc}
+  \toprule
+Variable & Model 1 & Model 2 & Model 3 \\ 
+  \midrule
+Access to financial institutions & 1 & 1 & 1 \\
+Value added in agriculture & 1 & 1 & 1 \\ 
+Financial institutions efficiency & 1 & 1 & 1 \\
+Outward orientation & 1 & 1 & 1 \\
+Financial market depth & 1 & 1 & 1 \\
+Education index (UN) & 1 & 1 & 1 \\
+War years & 1 & 1 & 1 \\
+Redistribution & 1 & 0 & 1 \\
+Average GDP growth & 0 & 0 & 1 \\
+  \bottomrule
+\end{tabularx}
+%
+\begin{tablenotes}[normal, flushleft]
+\footnotesize													
+\item Note: 1 marks inclusion of the variable in the model, whereas 0 suggests otherwise. The variables not listed were not included in neither of the models.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}			
+
+\begin{table}[ht!]
+\caption{Group posterior inclusion probabilities}
+\label{tab:grouppips}
+\centering
+\begin{tabular}{lr}
+  \toprule
+Group & PIP \\ 
+  \midrule
+  Financial & 1.00 \\ 
+  Economic & 1.00 \\ 
+  Political & 0.85 \\ 
+  Institutional & 0.70 \\ 
+  Geographical & 0.65 \\ 
+  Regulatory & 0.34 \\ 
+   \bottomrule
+\end{tabular}
+\end{table}
+\clearpage
+
+\subsection*{OLS estimates of the restricted models}
+% at alternative presentation of the OLS results
+\begin{table}[!htbp] 
+\centering 
+\caption{Output of the linear regression specifications, dependent variable GiniWealth} 
+\label{res:ols}
+\begin{threeparttable}
+\begin{tabular}{@{\extracolsep{5pt}}lcc} 
+\toprule
+  & (1) & (2) \\ 
+\midrule
+ Access to financial institutions & $-$0.376$^{***}$ & $-$0.411$^{***}$ \\ 
+  & (0.140) & (0.140) \\ 
+ Value added in agriculture & $-$0.637$^{***}$ & $-$0.626$^{***}$ \\ 
+  & (0.141) & (0.143) \\ 
+ Financial institutions efficiency & $-$0.356$^{***}$ & $-$0.377$^{***}$ \\ 
+  & (0.100) & (0.100) \\ 
+ Outward orientation & 0.319$^{***}$ & 0.320$^{***}$ \\ 
+  & (0.086) & (0.087) \\ 
+ Financial markets depth & 0.470$^{***}$ & 0.522$^{***}$ \\ 
+  & (0.124) & (0.121) \\ 
+ Education index & $-$0.388$^{**}$ & $-$0.413$^{**}$ \\ 
+  & (0.157) & (0.158) \\ 
+ Number of war years & 0.146 &  \\ 
+  & (0.091) &  \\ 
+ Redistribution & $-$0.213$^{*}$ & $-$0.230$^{*}$ \\ 
+  & (0.114) & (0.115) \\ 
+\midrule 
+Observations & 73 & 73 \\ 
+R$^{2}$ & 0.574 & 0.556 \\ 
+Adjusted R$^{2}$ & 0.520 & 0.509 \\ 
+Residual Std. Error & 0.693 (df = 64) & 0.701 (df = 65) \\ 
+F Statistic & 10.761$^{***}$ (df = 8; 64) & 11.645$^{***}$ (df = 7; 65) 
+\end{tabular}
+\begin{tablenotes}[normal, flushleft]
+\footnotesize
+\item Note: {$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01.} The specification of the model (1) corresponds to the model with the highest posterior model probability, whereas the model (2) containts the regressors with \ac{pip} $>$ 0.5 in the baseline \ac{bma} estimation.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+\clearpage
+
+\subsection*{Dataset description}
+\begin{center}
+\footnotesize
+\begin{longtable}{l p{0.50\linewidth} p{0.3\linewidth}}
+\caption{List of variables} 
+\label{app:data}
+\\
+  \toprule
+  Variable & Definition (+ optional comments) & Source \\
+  \midrule
+  GiniWealth & Gini index based on the distribution of wealth from Credit Suisse Wealth Reports 2010-2016 & \href{https://www.credit-suisse.com/cz/en/about-us/research/research-institute/global-wealth-report.html?WT.i_short-url=%2Fgwr&WT.i_target-url=%2Fcz%2Fen%2Fabout-us%2Fresearch%2Fresearch-institute%2Fglobal-wealth-report.html}{Credit Suisse} \\
+
+  FIA & Access to financial institutions & \href{http://data.imf.org/?sk=F8032E80-B36C-43B1-AC26-493C5B1CD33B}{\citet{svirydzenka2016introducing}} \\
+
+  FID & Financial institutions depth & \href{http://data.imf.org/?sk=F8032E80-B36C-43B1-AC26-493C5B1CD33B}{\citet{svirydzenka2016introducing}} \\
+
+  FIE & Financial institutions efficiency & \href{http://data.imf.org/?sk=F8032E80-B36C-43B1-AC26-493C5B1CD33B}{\citet{svirydzenka2016introducing}} \\
+
+  FMD & Financial markets depth & \href{http://data.imf.org/?sk=F8032E80-B36C-43B1-AC26-493C5B1CD33B}{\citet{svirydzenka2016introducing}} \\
+
+  FME & Financial markets efficiency & \href{http://data.imf.org/?sk=F8032E80-B36C-43B1-AC26-493C5B1CD33B}{\citet{svirydzenka2016introducing}} \\
+
+  GDP90 & Level of GDP per capita in 1990 & \href{http://febpwt.webhosting.rug.nl/Home}{PWT (9.0)} \\
+
+  NatRes & Total natural resource rents are the sum of oil rents, natural gas rents, coal rents (hard and soft), mineral rents, and forest rents. Average 1980-2009 & \href{http://data.worldbank.org/indicator/NY.GDP.TOTL.RT.ZS}{WB} \\
+  
+  PopGrowth & Annual population growth 1980-2009 & \href{http://data.worldbank.org/indicator/SP.POP.GROW}{WB} \\
+
+  GovExp & General government final consumption expenditure (formerly general government consumption). Average 1980-2009 & \href{http://data.worldbank.org/indicator/NE.CON.GOVT.ZS}{WB}\\
+
+  NNSavings & Net national savings (gross national savings less the value of consumption of fixed capital, \% GNI). Average 1980-2009 & \href{http://data.worldbank.org/indicator/NY.ADJ.NNAT.GN.ZS}{WB} \\
+
+  EducExp & Education expenditure refers to the current operating expenditures in education, including wages and salaries and excluding capital investments in buildings and equipment. Average 1980-2009. & \href{http://data.worldbank.org/indicator/NY.ADJ.AEDU.GN.ZS}{WB} \\
+
+  Infl & Inflation as measured by the consumer price index. Average 1980-2009. & \href{http://data.worldbank.org/indicator/FP.CPI.TOTL.ZG}{WB} \\
+
+  VAA & Agriculture, forestry, and fishing value added (\% GDP). Average 1980-2009. & \href{http://data.worldbank.org/indicator/NV.AGR.TOTL.ZS}{WB} \\
+
+  VAI & Industry value added (\% GDP). Average 1980-2009. & \href{http://data.worldbank.org/indicator/NV.IND.TOTL.ZS}{WB} \\
+
+  StartBussC & Cost of business start-up procedures (\% of GNI per capita). Average 1980-2009 & \href{http://data.worldbank.org/indicator/IC.REG.COST.PC.ZS}{WB} \\
+
+  StartBussT & Time required to start a business (days). Average 1980-2009 & \href{http://data.worldbank.org/indicator/IC.REG.DURS}{WB} \\
+
+  GFCF & Gross fixed capital formation (\% of GDP). Average 1980-2009 & \href{http://data.worldbank.org/indicator/NE.GDI.FTOT.ZS}{WB} \\
+
+  NetFDI &  Foreign direct investment, net inflows (\% of GDP). Average 1980-2009 & \href{http://data.worldbank.org/indicator/BX.KLT.DINV.WD.GD.ZS}{WB} \\
+
+  Ygrowth & Annual growth of GDP. Average 1980-2009 & \href{http://www.rug.nl/research/ggdc/data/pwt/pwt-9.0}{PWT 9.0} \\
+
+  LifeExp90 & Life expectancy at birth in 1990 & \href{http://data.worldbank.org/indicator/SP.DYN.LE00.IN}{WB}\\
+     
+  LabForce90 & Total labor force comprises people ages 15 and older who meet the International Labor Organization definition of the economically active population: all people who supply labor for the production of goods and services during a specified period. Labor force total, 1990. Not available before 1990. & \href{http://data.worldbank.org/indicator/SL.TLF.CACT.ZS}{WB} \\
+
+  PopDens90 & Population density (people per sq. km of land area) in 1990. & \href{http://data.worldbank.org/indicator/EN.POP.DNST}{WB} \\
+
+  RevCoups & Revolutions and coups, total instances between 1950 and 2010 & \href{http://jpr.sagepub.com/content/48/2/249.abstract}{Powell and Thyne (2011)} \\
+  
+  EthnoLfrac & Ethnolinguistic franctionalization. The most detailed/disaggregated fractionalization measure (ELF.15 in the original paper) is assumed as it is found most relevant to growth and has highest correlation with other fractionalization measure by \href{http://www.nsd.uib.no/macrodataguide/set.html?id=16&sub=1}{Alesina et al. (2003)} & \href{http://www.anderson.ucla.edu/faculty_pages/romain.wacziarg/papersum.html}{Desmet et al. (2009)} \\
+  
+  WarYears & Number of war years (including civil wars) between 1946-2009 as defined in the UCDP dataset (more than 1000 casulties within a year) & \href{http://www.pcr.uu.se/research/ucdp/datasets/ucdp_prio_armed_conflict_dataset/}{UCDP/PRIO data} \\
+  
+  RuleOfLaw & Rule of law 1970-2009 (\textit{alternatively WB has data 1996-2014})& \href{http://efwdata.com/grid/WxRvYnU#/Grid}{Fraser institute} \\
+
+  CivLib & Civil liberties 1973-2009 & \href{https://freedomhouse.org/report/freedom-world-2016/methodology}{Freedom House} \\
+  
+  PolRights & Political rights 1973-2009 & \href{https://freedomhouse.org/report/freedom-world-2016/methodology}{Freedom House} \\
+  
+  OutwardO & Measure of outward orientation derived as Net exports/GDP (\textit{previously based on data 1950-1983}) & \href{http://www.rug.nl/research/ggdc/data/pwt/pwt-9.0}{PWT 9.0} \\
+  
+  LatAm & 1 for Latin American countries & \\
+  
+  ChinnIto & Chinn-Ito index of financial opennes. Average 1980-2010. & \href{http://web.pdx.edu/~ito/Chinn-Ito_website.htm}{Chinn-Ito} \\ 
+
+  LeftWing & Number of years between 1980 and 2009 when left oriented party lead the country. & \href{http://www.nsd.uib.no/macrodataguide/set.html?id=11&sub=1}{DPI} \\
+  
+  ActivRestrict & Activity restrictions. Regulatory restrictions on bank activities and the mixing of banking and commerce. & \href{http://faculty.haas.berkeley.edu/ross_levine/regulation.htm}{Barth et al. (2013)} \\
+  
+  CapitalReg & Capital Regulatory index. & \href{http://faculty.haas.berkeley.edu/ross_levine/regulation.htm}{Barth et al. (2013)} \\
+  
+  DiversIndex & Whether there are explicit, verifiable, quantifiable guidelines for asset diversification and banks are allowed to make loans abroad. & \href{http://faculty.haas.berkeley.edu/ross_levine/regulation.htm}{Barth et al. (2013)} \\
+  
+  LAMRIG & Index capturing the rigidity of employment protection legislation & \href{https://www.iza.org/publications/dp/6881}{Campos \& Nugent (2012)} \\
+
+  Tech & Index on the level of technological development based on CHAT dataset & \href{http://www.nber.org/data/chat/}{Comin \& Hobijn (2009)} \\
+
+  EducIndex & Calculated using mean years of schooling and expected years of schooling & \href{http://hdr.undp.org/en/content/education-index}{UN} \\
+
+  NetInterestMargin & Accounting value of banks' net interest revenue as a share of average interest-bearing assets; a measure of the efficiency of the banking sector. & \href{http://data.worldbank.org/data-catalog/global-financial-development}{GFDD} \\
+  
+  BankZScore & return on banks' assets plus the ratio of banks' equity and assets, divided
+  by the standard deviation of the return on assets (ROA+equity/assets)/sd(ROA); a measure of stability of the banking sector & \href{http://data.worldbank.org/data-catalog/global-financial-development}{GFDD} \\
+  
+  Privatecredit & Domestic private credit to the real sector to GDP; a measure of the depth of the banking sector & \href{http://data.worldbank.org/data-catalog/global-financial-development}{GFDD} \\
+  
+  MarketCap & Value of listed shares to GDP; a measure of the
+  depth of stock markets.& \href{http://data.worldbank.org/data-catalog/global-financial-development}{GFDD} \\
+  
+  MarketTurn & Stock market value traded to total market capitalization; a measure of the efficiency of stock markets. & \href{http://data.worldbank.org/data-catalog/global-financial-development}{GFDD} \\
+  
+  BankBranches & Number of bank branches per 100,000 adults & \href{http://data.worldbank.org/data-catalog/global-financial-development}{GFDD} \\
+
+  Loan2Deposits & Loan-to-deposit ratio. & \href{http://data.worldbank.org/data-catalog/global-financial-development}{GFDD} \\
+  
+  Redist & Difference between market (pre-tax) and net (after-tax0 Gini index based on distribution of income  (The Standardized World Income Inequality Database). & \href{http://fsolt.org/swiid/}{Solt (2016)} \\	
+
+  FST & Genetic distance data (distance from the US) & \href{https://sites.tufts.edu/enricospolaore/research/}{\citet{spolaore2009diffusion}} \\
+
+  FinReform & Financial reform index by Abiad (2010) & \href{https://www.imf.org/en/Publications/WP/Issues/2016/12/31/A-New-Database-of-Financial-Reforms-22485}{\citet{Abiadetal2008}} \\
+
+  FinLib & Averaged components of Economic Freedom of the World index 3D (freedom to own foreign currency accounts), 4C (black-market exchange rates), 4D (controls of the movement of capital and people), and 5A (credit market regulations). & \href{https://www.fraserinstitute.org/economic-freedom/dataset}{\citet{gwartney2017}} \\
+
+\end{longtable}
+\end{center}
+
+\begin{figure}[ht!]
+	\caption{Top 10\% wealth and income shares in \ac{oecd} countries}
+	\centering
+	\includegraphics[width=0.9\textwidth]{figures/wealthincome_comp_oecd.eps}
+	\label{fig:wealthincome_comp_oecd}
+	
+	Note: Source: Author based on the \ac{oecd}
+\end{figure}
+
+\newpage
+\subsection*{Bayesian Model Averaging}
+\label{sec:app_bma}
+First, consider the following linear model:
+%
+% OLS notation
+\begin{equation}
+\label{eq:OLS}
+y = \alpha + X\beta+ \varepsilon \qquad \varepsilon  \sim\ N(0, \sigma^{2}I)
+\end{equation}
+%
+where $y$ represents a dependent variable, $\alpha$ is a constant, $X$ is the matrix of explanatory variables, $\beta$ represents the corresponding coefficients, and $\varepsilon$ is a vector of normally distributed IID error terms with variance $\sigma^{2}$. 
+
+\ac{bma} takes into consideration all possible combinations of $X$ from equation \ref{eq:OLS} and takes a weighted average of the estimated coefficients. Even with a modest-sized regression model, the number of combinations rises dramatically, and even with current computers, it is impossible to estimate all regression models. For this reason, a subset of models is considered, and an MCMC sampler is employed (we discuss the sampler in detail below). The substructure of the model is as follows:
+%
+% submodel structure
+\begin{equation}\label{eq:OLSsub}
+y = \alpha_{i} + X_{i}\beta_{i}+ \varepsilon \qquad \varepsilon  \sim\ N(0, \sigma^{2}I)
+\end{equation}
+%
+$X_{i}$ corresponds to a subset of $X$, and $\alpha_{i} $ and $ \beta_{i}$ are the corresponding coefficients. If the number of regressors is $K$, the total number of models equals $2^{K}$, and $i \in [1,2^{K}]$. 
+
+Bayes' rule implies that
+%
+% Bayes' rule with 'model' notation
+\begin{equation}\label{eq:BRmodel}
+p(\beta \vert y,X) = \frac{p(y,X\vert \beta)p(\beta)}{p(y,X)}
+\end{equation}
+where $p(\beta \vert y, X)$ is the posterior density, $p(y, X\vert \beta)$ is the marginal likelihood (ML), $p(\beta)$ is the prior density, and $p(y,X)$ is the probability of the data. 
+
+The individual regression models are denoted as $M_{1},...,M_{i}$. In the case of $K$ regressors, there are $M_{1},...,M_{i}$ regression models, where $i \in [1,2^{K}]$. The model is formed using a likelihood function and a prior density, where $M_{i}$ depends on the parameters $\beta_{i}$, with a posterior probability to be derived in the following manner:
+\begin{equation}\label{eq:BROM}
+p(\beta_{i} \vert M_{i},y,X) = \frac{p(y\vert \beta_{i},M_{i},X)p(\beta_{i}\vert M_{i})}{p(y \vert M_{i},X)}
+\end{equation}
+Next, we describe the averaging principle of \ac{bma} and individual components of equation \ref{eq:BRmodel}.
+%
+%%
+\subsection*{Posterior Model Probability}
+%%
+%
+The \ac{pmp} provides the weights for averaging model parameters across the individual models. The \ac{pmp} also arises from Bayes' theorem:
+
+\begin{equation}\label{eq:PMPmain}
+p(M_{i} \vert y,X) = \frac{p(y\vert M_{i},X)p(M_{i})}{p(y \vert X)}
+\end{equation}
+
+where $p(y\vert M_{i},X)$ is the marginal likelihood (ML) of the model (i.e., the probability of the data given the model $M_{i}$), $p(M_{i})$ is the prior model probability, and $p(y\vert X)$ is the integrated likelihood. The term in the denominator is typically disregarded because it is constant across all models under consideration. The \ac{pmp} then becomes directly proportional to ML and the prior probability. The prior probability $p(M_{i} \propto 1)$ is typically set to acknowledge that the `true' model is unknown.
+% Proportionality of PMP
+\begin{equation}
+p(M_{i}\vert y,X) \propto p(y\vert M_{i},X)p(M_{i})
+\end{equation}
+%
+We discuss the calculation of ML in detail in section \ref{sec:ML}. Researchers must set the model prior to reflect the beliefs regarding the data before inspecting them. 
+%
+\subsection*{Posterior Mean}
+The parameter point estimates are derived within the Bayesian framework as follows. \citet{Zeugner2011} and \citet{MoralBenito2012} show that the weighted posterior distribution of any statistic (most notably the $\beta$ coefficients) is obtained as follows:
+%
+%% Posterior distribution of the coefficients
+\begin{equation}\label{eq:parest}
+p(\beta \vert y, X) = \sum_{i=1}^{2^{K}} p(\beta_{i} \vert M_{i},y,X)p(M_{i} \vert y,X)
+\end{equation}
+
+where $p(M_{i} \vert y, X)$ is the \ac{pmp} of the corresponding model $M_{i}$ from equation \ref{eq:PMPmain}. The point estimates are obtained by taking expectations:
+
+\begin{equation}\label{eq:pointparest}
+E(\beta \vert y, X) = \sum_{i=1}^{2^{K}} E(\beta_{i} \vert M_{i},y,X)p(M_{i} \vert y,X)
+\end{equation}
+
+$E(\beta \vert y, X)$ represents the average coefficient, and $E(\beta \vert M_{i},y,X)$ is the estimate of the $\beta_{i}$ coefficients from model $M_{i}$. The posterior distribution of the coefficients depends on the choice of the prior $g$. \citet{Zeugner2011} expresses the expected value of the parameter in $M_{i}$ as follows:
+\begin{equation}\label{eq:postdist}
+E(\beta_{i} \vert y,X,g,M_{i}) = \frac{g}{1+g}\hat{\beta_{i}}
+\end{equation}
+with $\hat{\beta_{i}}$ corresponding to the standard OLS estimate.
+
+\subsection*{Posterior Variance}
+\citet{MoralBenito2012} provides a formula for the variance corresponding to the expected values of the coefficients derived in the previous subsection:
+\begin{equation}\label{eq:postvar}
+\begin{aligned}
+Var(\beta \vert y, X) &= \sum_{i=1}^{2^{K}} p(M_{i} \vert y,X)Var(\beta_{i} \vert M_{i},y,X) \\ 
+& +\sum_{i=1}^{2^{K}}p(M_{i} \vert y,X){(E(\beta_{i}\vert M_{i},y,X)-E(\beta \vert y, X))}^{2}
+\end{aligned}
+\end{equation}
+The variance consists of two terms: the weighted average of variance estimates across different models $Var(\beta_{i} \vert M_{i},y,X)$ and the weighted variance across different models in the second component ${{E(\beta_{i}\vert  M_{i},y,X)}-{E(\beta \vert y,X))}}^{2}$. $E(\beta \vert y,X)$ represents the posterior mean from equation \ref{eq:pointparest}. As a result, \ac{bma} accounts for uncertainty regarding the parameter estimates that arise due to differences across models in addition to the uncertainty of individual models. \citet{Zeugner2011} derives how the value of the prior $g$ affects the posterior variance of the parameters:
+%
+% Posterior variance of betas
+\begin{equation}\label{eq:postvarZ}
+Cov(\beta_{i}\vert y,X,g,M_{i}) = \frac{(y-\bar{y})'(y-\bar{y})}{N-3} \frac{g}{1+g} \left( 1- \frac{g}{1+g}R_{i}^{2} \right) (X_{i}'X_{i})^{-1}
+\end{equation}
+where $\bar{y}$ denotes the mean of vector $y$, $N$ is the sample size, and $R^{2}_{i}$ is the R-squared value corresponding to the model $i$.
+%
+%%
+\subsection*{Marginal Likelihood}\label{sec:ML}
+ML can be calculated using equation \ref{eq:BROM} for each model $M_{i}$. Both sides of the equation must be integrated with respect to $\beta_{i}$. Employing $\int_{\beta} p(\beta_{i}\vert M_{i},y,X) \, d\beta_{i}=1$, it follows that
+%
+% Marginal likelihood basic
+\begin{equation}\label{eq:ML}
+p(y \vert  M_{i},X) = \int_{\beta}{p(y \vert \beta_{i},M_{i},X)p(\beta_{i} \vert M_{i},X) \, d\beta_{i}}
+\end{equation}
+%%
+The above equation illustrates the general textbook derivation, but the computation depends on the elicited priors. \citet{Zeugner2011} employs the ``Zellner's g prior'' structure, which we also utilize in this paper. The ML for a single model can then be expressed using the prior as in \citet{FeldkircherZeugner2009}:
+\begin{equation}\label{eq:MLFZ}
+p(y \vert  M_{i},X,g) = \int_{0}^{\infty}{\int_{\beta}{p(y \vert \beta_{i}, \sigma^{2},M_{i})p(\beta_{i},\sigma^{2} \vert g) \, d\beta d\sigma}}
+\end{equation}
+Furthermore, \citet{FeldkircherZeugner2009} show that ML is in this case simply proportional to
+%
+% Marginal likelihood using g prior, from Zeugner 2011
+\begin{equation}
+\label{eq:MLg}
+p(y \vert M_{i}, X, g) \propto (y-\bar{y})'(y-\bar{y})^{- \frac{N-1}{2}} (1+g)^{- \frac{k_{i}}{2}} \left(1- \frac{g}{1+g}R^{2}_{i} \right)^{- \frac{N-1}{2}}
+\end{equation}
+In this equation, $R^{2}_{i}$ is the R-squared of model $M_{i}$, and $k_{i}$ is the number of explanatory variables in model $i$ introduced to include a size penalty for the model. $N$ and $\bar{y}$ are the same as in equation \ref{eq:postvarZ}, i.e., the number of observations and the mean of vector $y$, respectively.
+%%
+%%
+\subsection*{Posterior Inclusion Probability}
+The standard \ac{bma} framework provides the \ac{pip}, which indicates the probability that a particular regressor is included in the ``true'' model. The \ac{pip} is the sum of the \ac{pmp}s of the models including the variable $k$:
+\begin{equation}\label{PIP}
+PIP = p(\beta_{k} \neq 0 \vert y, X) = \sum_{i=1}^{2^{K}} p(M_{i} \vert \beta_{k} \neq 0, y, X)
+\end{equation}
+
+\subsection*{MCMC Sampler}
+\label{sec:mc3}
+One of the limitations of \ac{bma} is its computational difficulty when the number of potential regressors $K$ becomes very large. Historically, the computational burden has been the primary factor preventing researchers from employing Bayesian methods. \citet{Zeugner2011} notes that for small models, it is possible to enumerate all variable combinations. However, when $K > 25$, it becomes impossible to evaluate the entire model space within a reasonable time frame. In such cases, \ac{bma} utilizes MC$^{3}$ samplers to approximate the crucial part of the posterior model distribution containing the most likely models. \ac{bma} applies the Metropolis-Hastings algorithm, which is outlined in \citet{Zeugner2011} as follows:
+
+At any step $i$, the sampler is currently at model $M_{i}$, having \ac{pmp} $p(M_{i} \vert y,X)$. In the next step $i+1$, model $M_{j}$ is proposed to replace $M_{i}$. The sampler accepts the new model $M_{j}$ with the following probability:
+\begin{equation}\label{eq:sampler}
+p_{i,j} = min \left( 1, \frac{p(M_{j} \vert y,X)}{p(M_{i} \vert y,X)}\right)
+\end{equation}
+If model $M_{j}$ is rejected, the next model $M_{k}$ is suggested and compared with $M_{i}$. With an increasing number of iterations, the number of times each model is retained converges to the distribution of posterior model probabilities. Typically, one of the following MC$^{3}$ samplers is used to construct the models:
+%
+\begin{itemize}
+	\item{Birth-death sampler - randomly chooses one of the explanatory variables, which is included if it is not already part of the current model $M_{i}$ or dropped if it is already in $M_{i}$.}
+	%
+	\item{Reversible-jump sampler - with 50\% probability, the birth-death sampler is used to determine the next candidate model. With 50\% probability, the sampler randomly swaps one of the covariates in $M_{i}$ for a covariate previously excluded from $M_{i}$.}
+\end{itemize}
+%
+Because the sampler can begin with a ``poor'' model with low \ac{pmp}, the predefined number of initial draws, the so-called burn-ins, are usually dropped. The quality of the approximation can be evaluated on the basis of the correlation between the \ac{pmp} derived from an analytical approach and those obtained from the MC$^{3}$ sampler. It depends on the number of iterations (draws) and the likelihood of the initially selected model. \citet{Zeugner2011} notes that a \ac{pmp} correlation of approximately 0.9 indicates a ``good degree of convergence''. In the event that the correlation is lower, the number of sampler iterations should be increased.
+
+\end{document}
