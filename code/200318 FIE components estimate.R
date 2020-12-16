@@ -175,10 +175,10 @@ coef(bma_finind, exact=T)
 save(bma_finind, file = here('results/results_fie_components.Rdata'))
 
 # Load the estimates if available
-# load("Results/JIMF review/results_baseline.Rdata")
+load("results/results_fie_components.Rdata")
 
 # Write results into a file
-results <- as.data.table(cbind(variable=row.names(coef(bma_finind)), as.data.table(coef(bma_finind, exact = T))))
+results <- as.data.table(cbind(variable=row.names(coef(bma_finind, exact = T)), as.data.table(coef(bma_finind, exact = T))))
 write.csv(results, file=here('results/results_fie_components.csv'), row.names = F)
 
 #
@@ -207,7 +207,8 @@ explvarshort <- c("NatRes","PopGrowth","GovExp","NNSavings","EducExp","Infl","In
                   "Glob_financial","Glob_social","Glob_political","Glob_restrictions","FST",
                   "debt_ch","y_ch","Redist_relative","EduQuality",
                   "d_bottom_inequality","d_bottom_inequality#FIA",
-                  "d_bottom_inequality#FIE","d_bottom_inequality#FID","d_bottom_inequality#FMD")
+                  "d_bottom_inequality#FIE","d_bottom_inequality#FID","d_bottom_inequality#FMD",
+                  "OverheadCostsToAssets","ROAbeforeTax","ROEbeforeTax","NonIntIncomeToIncome")
 
 explvarnames <- c("Natural resources rents","Population growth","Government expenditures","Net national savings",
                   "Public education expenditures","Inflation","Inflation volatility","Value added in industry",
@@ -242,13 +243,14 @@ explvarnames <- c("Natural resources rents","Population growth","Government expe
                   "Trade restrictions (KOF)","Genetic difference from the US",
                   "Crisis severity (change in debt)","Crisis severity (change in GDP growth)","Redistribution (rel.)",
                   "Education quality (WB)","50% quantile WG","50% quantile WG#FIA",
-                  "50% quantile WG#FIE","50% quantile WG#FID","50% quantile WG#FMD")
+                  "50% quantile WG#FIE","50% quantile WG#FID","50% quantile WG#FMD",
+                  "Overhead costs / Assets","Pre-tax ROA", "Pre-tax ROE","Non-interest income")
 
 # Bind short and long variables names together
 varnames <- data.frame(cbind(explvarshort=as.character(explvarshort), explvarnames=as.character(explvarnames)))
 
 # Creating results table - without economic variables
-results_eco <- merge(results_eco, varnames, by.x="variable", by.y="explvarshort", sort=F)
+results_eco <- merge(results, varnames, by.x="variable", by.y="explvarshort", sort=F)
 
 # reorder columns and drop redundant columns
 results_eco[, c("variable","Cond.Pos.Sign","Idx") := NULL]
